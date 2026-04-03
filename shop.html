@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mua Hàng</title>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="shop.css">
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <i class="fas fa-check-circle toast-icon"></i>
+  <span class="toast-text" id="toastText">Đã thêm vào giỏ hàng!</span>
+</div>
+
+<!-- MODAL CHI TIẾT SẢN PHẨM -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="productModal" style="position:relative;">
+    <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+    <div class="modal-grid">
+      <div class="modal-img" id="modalImg">💻</div>
+      <div class="modal-content">
+        <div class="product-category" id="modalCat"></div>
+        <h2 id="modalName"></h2>
+        <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.3rem;">
+          <span style="color:var(--warning);font-size:0.85rem;" id="modalRating">★★★★☆</span>
+          <span style="font-size:0.78rem;color:var(--text-muted);" id="modalReviews">(0 đánh giá)</span>
+        </div>
+        <div class="modal-price" id="modalPrice"></div>
+        <div class="modal-specs" id="modalSpecs"></div>
+        <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.7;" id="modalDesc"></p>
+        <div class="modal-actions">
+          <button class="btn-buy" onclick="buyNow()"><i class="fas fa-bolt"></i> Mua ngay</button>
+          <button class="btn-cart-lg" onclick="addToCartModal()"><i class="fas fa-shopping-cart"></i> Thêm giỏ</button>
+        </div>
+        <div style="display:flex;gap:1.5rem;margin-top:1rem;font-size:0.78rem;color:var(--text-muted);">
+          <span><i class="fas fa-shield-alt" style="color:var(--success);margin-right:0.3rem;"></i>Đã kiểm tra</span>
+          <span><i class="fas fa-undo" style="color:var(--accent);margin-right:0.3rem;"></i>Đổi 7 ngày</span>
+          <span><i class="fas fa-truck" style="color:var(--accent2);margin-right:0.3rem;"></i>Toàn quốc</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">I<span>TC</span></a>
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Tìm CPU, RAM, GPU, Mainboard..." oninput="liveSearch()">
+      <button onclick="doSearch()"><i class="fas fa-search"></i></button>
+    </div>
+    <nav>
+      <a href="index.html">Trang chủ</a>
+      <a href="shop.html" class="active">Mua hàng</a>
+      <a href="sell.html">Bán hàng</a>
+      <a href="lien-he.html">Liên hệ</a>
+      <a href="orders.html">Đơn hàng</a>
+    </nav>
+    <div class="header-actions">
+      <button class="cart-btn" onclick="showCartDropdown()">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-badge" id="cartBadge">0</span>
+      </button>
+      <div id="authButtons">
+        <a href="login.html" class="btn-outline">Đăng nhập</a>
+        <a href="login.html?tab=register" class="btn-primary">Đăng ký</a>
+      </div>
+      <div id="userMenu" style="display:none;align-items:center;gap:0.8rem;">
+        <div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0.9rem;background:rgba(0,212,255,0.08);border:1px solid var(--border);border-radius:8px;">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--accent3);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:white;" id="userAvatar">U</div>
+          <span style="font-size:0.88rem;font-weight:600;" id="userName">User</span>
+        </div>
+        <button onclick="logout()" style="padding:0.45rem 1rem;border:1px solid rgba(239,68,68,0.5);border-radius:6px;background:none;color:#ef4444;font-family:inherit;font-size:0.85rem;font-weight:600;cursor:pointer;">
+          <i class="fas fa-sign-out-alt"></i> Đăng xuất
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb-bar">
+  <div class="breadcrumb-inner">
+    <a href="index.html"><i class="fas fa-home"></i> Trang chủ</a>
+    <i class="fas fa-chevron-right"></i>
+    <span id="breadcrumbCurrent">Mua hàng</span>
+  </div>
+  <div class="result-count" id="resultCount">Đang tải...</div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="shop-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="shop-sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h3><i class="fas fa-sliders-h"></i> Bộ lọc</h3>
+      <button class="clear-all-btn" onclick="clearAllFilters()">Xóa tất cả</button>
+    </div>
+
+    <!-- Danh mục -->
+    <div class="filter-block">
+      <div class="filter-block-title" onclick="toggleBlock(this)">
+        <span><i class="fas fa-th-large"></i> Danh mục</span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="filter-block-body">
+        <label class="filter-option" onclick="filterCat('all')">
+          <span class="filter-radio active" id="cat-all"></span>
+          <span>Tất cả</span>
+          <span class="filter-count">8</span>
+        </label>
+        <label class="filter-option" onclick="filterCat('CPU')">
+          <span class="filter-radio" id="cat-CPU"></span>
+          <span>🔲 CPU</span>
+          <span class="filter-count">2</span>
+        </label>
+        <label class="filter-option" onclick="filterCat('RAM')">
+          <span class="filter-radio" id="cat-RAM"></span>
+          <span>🧩 RAM</span>
+          <span class="filter-count">2</span>
+        </label>
+        <label class="filter-option" onclick="filterCat('GPU')">
+          <span class="filter-radio" id="cat-GPU"></span>
+          <span>🖥️ Card màn hình</span>
+          <span class="filter-count">1</span>
+        </label>
+        <label class="filter-option" onclick="filterCat('Mainboard')">
+          <span class="filter-radio" id="cat-Mainboard"></span>
+          <span>🔌 Mainboard</span>
+          <span class="filter-count">1</span>
+        </label>
+        <label class="filter-option" onclick="filterCat('SSD')">
+          <span class="filter-radio" id="cat-SSD"></span>
+          <span>💾 SSD / HDD</span>
+          <span class="filter-count">1</span>
+        </label>
+        <label class="filter-option" onclick="filterCat('Nguồn')">
+          <span class="filter-radio" id="cat-Nguồn"></span>
+          <span>⚡ Nguồn</span>
+          <span class="filter-count">1</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Khoảng giá -->
+    <div class="filter-block">
+      <div class="filter-block-title" onclick="toggleBlock(this)">
+        <span><i class="fas fa-tag"></i> Khoảng giá</span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="filter-block-body">
+        <div class="price-display">
+          <span id="priceMin">0₫</span>
+          <span>—</span>
+          <span id="priceMax">15.000.000₫</span>
+        </div>
+        <div class="range-wrap">
+          <input type="range" id="rangeMin" min="0" max="15000000" step="100000" value="0" oninput="updatePriceRange()">
+          <input type="range" id="rangeMax" min="0" max="15000000" step="100000" value="15000000" oninput="updatePriceRange()">
+        </div>
+        <div class="price-presets">
+          <button onclick="setPrice(0,2000000)">Dưới 2tr</button>
+          <button onclick="setPrice(2000000,5000000)">2tr - 5tr</button>
+          <button onclick="setPrice(5000000,15000000)">Trên 5tr</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tình trạng -->
+    <div class="filter-block">
+      <div class="filter-block-title" onclick="toggleBlock(this)">
+        <span><i class="fas fa-heartbeat"></i> Tình trạng</span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="filter-block-body">
+        <label class="filter-checkbox">
+          <input type="checkbox" value="great" onchange="updateCondFilter()"> Như mới (90–100%)
+          <span class="filter-count">3</span>
+        </label>
+        <label class="filter-checkbox">
+          <input type="checkbox" value="good" onchange="updateCondFilter()"> Còn tốt (75–89%)
+          <span class="filter-count">4</span>
+        </label>
+        <label class="filter-checkbox">
+          <input type="checkbox" value="fair" onchange="updateCondFilter()"> Bình thường (60–74%)
+          <span class="filter-count">1</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Thương hiệu -->
+    <div class="filter-block">
+      <div class="filter-block-title" onclick="toggleBlock(this)">
+        <span><i class="fas fa-award"></i> Thương hiệu</span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="filter-block-body">
+        <label class="filter-checkbox">
+          <input type="checkbox" value="Intel" onchange="updateBrandFilter()"> Intel
+          <span class="filter-count">1</span>
+        </label>
+        <label class="filter-checkbox">
+          <input type="checkbox" value="AMD" onchange="updateBrandFilter()"> AMD
+          <span class="filter-count">1</span>
+        </label>
+        <label class="filter-checkbox">
+          <input type="checkbox" value="NVIDIA" onchange="updateBrandFilter()"> NVIDIA
+          <span class="filter-count">1</span>
+        </label>
+        <label class="filter-checkbox">
+          <input type="checkbox" value="ASUS" onchange="updateBrandFilter()"> ASUS
+          <span class="filter-count">1</span>
+        </label>
+        <label class="filter-checkbox">
+          <input type="checkbox" value="Kingston" onchange="updateBrandFilter()"> Kingston
+          <span class="filter-count">1</span>
+        </label>
+        <label class="filter-checkbox">
+          <input type="checkbox" value="Samsung" onchange="updateBrandFilter()"> Samsung
+          <span class="filter-count">1</span>
+        </label>
+        <label class="filter-checkbox">
+          <input type="checkbox" value="Corsair" onchange="updateBrandFilter()"> Corsair
+          <span class="filter-count">1</span>
+        </label>
+        <label class="filter-checkbox">
+          <input type="checkbox" value="Crucial" onchange="updateBrandFilter()"> Crucial
+          <span class="filter-count">1</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Bảo hành -->
+    <div class="filter-block">
+      <div class="filter-block-title" onclick="toggleBlock(this)">
+        <span><i class="fas fa-shield-alt"></i> Bảo hành còn lại</span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="filter-block-body">
+        <label class="filter-checkbox">
+          <input type="checkbox" value="6" onchange="updateWarrantyFilter()"> 6 tháng trở lên
+        </label>
+        <label class="filter-checkbox">
+          <input type="checkbox" value="3" onchange="updateWarrantyFilter()"> 3 tháng trở lên
+        </label>
+        <label class="filter-checkbox">
+          <input type="checkbox" value="1" onchange="updateWarrantyFilter()"> Có bảo hành
+        </label>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="shop-main">
+
+    <!-- TOOLBAR -->
+    <div class="shop-toolbar">
+      <div class="toolbar-left">
+        <button class="sidebar-toggle-btn" onclick="toggleSidebar()">
+          <i class="fas fa-sliders-h"></i> Bộ lọc
+        </button>
+        <!-- Active filters tags -->
+        <div class="active-filters" id="activeFilters"></div>
+      </div>
+      <div class="toolbar-right">
+        <div class="view-toggle">
+          <button class="view-btn active" id="viewGrid" onclick="setView('grid')" title="Dạng lưới">
+            <i class="fas fa-th"></i>
+          </button>
+          <button class="view-btn" id="viewList" onclick="setView('list')" title="Dạng danh sách">
+            <i class="fas fa-list"></i>
+          </button>
+        </div>
+        <select class="sort-select" onchange="sortProducts(this.value)">
+          <option value="">Sắp xếp: Mặc định</option>
+          <option value="price-asc">Giá: Thấp → Cao</option>
+          <option value="price-desc">Giá: Cao → Thấp</option>
+          <option value="newest">Mới đăng nhất</option>
+          <option value="condition">Tình trạng tốt nhất</option>
+          <option value="popular">Phổ biến nhất</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- PRODUCTS GRID -->
+    <div class="products-grid" id="productsGrid"></div>
+
+    <!-- EMPTY STATE -->
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <div class="empty-icon">🔍</div>
+      <h3>Không tìm thấy sản phẩm</h3>
+      <p>Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
+      <button class="btn-hero-primary" onclick="clearAllFilters()" style="margin-top:1rem;">
+        <i class="fas fa-redo"></i> Xóa bộ lọc
+      </button>
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="pagination" id="pagination"></div>
+
+  </main>
+</div>
+
+<!-- CART DROPDOWN -->
+<div class="cart-dropdown" id="cartDropdown">
+  <div class="cart-dropdown-header">
+    <h4><i class="fas fa-shopping-cart"></i> Giỏ hàng</h4>
+    <button onclick="closeCartDropdown()"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <div class="cart-empty"><i class="fas fa-box-open"></i><p>Giỏ hàng trống</p></div>
+  </div>
+  <div class="cart-footer" id="cartFooter" style="display:none;">
+    <div class="cart-total">
+      Tổng: <strong id="cartTotal">0₫</strong>
+    </div>
+    <button class="btn-buy" style="width:100%;padding:0.7rem;" onclick="checkout()">
+      <i class="fas fa-credit-card"></i> Thanh toán
+    </button>
+  </div>
+</div>
+<div class="cart-backdrop" id="cartBackdrop" onclick="closeCartDropdown()"></div>
+
+<script src="shop.js"></script>
+</body>
+</html>

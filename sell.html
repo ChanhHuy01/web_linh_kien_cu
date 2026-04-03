@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> Bán Hàng</title>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="sell.css">
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <i class="fas fa-check-circle toast-icon"></i>
+  <span class="toast-text" id="toastText"></span>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">I<span>TC</span></a>
+    <div class="search-bar">
+      <input type="text" placeholder="Tìm kiếm linh kiện...">
+      <button><i class="fas fa-search"></i></button>
+    </div>
+    <nav>
+      <a href="index.html">Trang chủ</a>
+      <a href="shop.html">Mua hàng</a>
+      <a href="sell.html" class="active">Bán hàng</a>
+      <a href="lien-he.html">Liên hệ</a>
+      <a href="orders.html">Đơn hàng</a>
+
+    </nav>
+    <div class="header-actions">
+      <button class="cart-btn"><i class="fas fa-shopping-cart"></i><span class="cart-badge">0</span></button>
+      <div id="authButtons">
+        <a href="login.html" class="btn-outline">Đăng nhập</a>
+        <a href="login.html?tab=register" class="btn-primary">Đăng ký</a>
+      </div>
+      <div id="userMenu" style="display:none;align-items:center;gap:0.8rem;">
+        <div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0.9rem;background:rgba(0,212,255,0.08);border:1px solid var(--border);border-radius:8px;">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--accent3);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:white;" id="userAvatar">U</div>
+          <span style="font-size:0.88rem;font-weight:600;" id="userName">User</span>
+        </div>
+        <button onclick="logout()" style="padding:0.45rem 1rem;border:1px solid rgba(239,68,68,0.5);border-radius:6px;background:none;color:#ef4444;font-family:inherit;font-size:0.85rem;font-weight:600;cursor:pointer;">
+          <i class="fas fa-sign-out-alt"></i> Đăng xuất
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- HERO BANNER -->
+<div class="sell-hero">
+  <div class="sell-hero-inner">
+    <div class="sell-hero-text">
+      <div class="hero-badge"><i class="fas fa-store"></i> Đăng bán miễn phí 100%</div>
+      <h1>Bán Linh Kiện Cũ<br><span>Nhanh – Dễ – Uy Tín</span></h1>
+      <p>Tiếp cận hàng nghìn người mua ngay lập tức. Quy trình đăng bán đơn giản, chỉ 4 bước trong vài phút.</p>
+      <div class="sell-hero-stats">
+        <div class="sh-stat"><span>50K+</span><p>Giao dịch</p></div>
+        <div class="sh-divider"></div>
+        <div class="sh-stat"><span>8.5K+</span><p>Người bán</p></div>
+        <div class="sh-divider"></div>
+        <div class="sh-stat"><span>0₫</span><p>Phí đăng bán</p></div>
+      </div>
+    </div>
+    <div class="sell-hero-steps">
+      <div class="mini-step"><div class="ms-num">01</div><div><b>Chụp ảnh & mô tả</b><p>Thêm ảnh và thông tin chi tiết</p></div></div>
+      <div class="ms-arrow"><i class="fas fa-arrow-right"></i></div>
+      <div class="mini-step"><div class="ms-num">02</div><div><b>Đặt giá</b><p>Tự do định giá theo thị trường</p></div></div>
+      <div class="ms-arrow"><i class="fas fa-arrow-right"></i></div>
+      <div class="mini-step"><div class="ms-num">03</div><div><b>Kiểm duyệt</b><p>Duyệt trong 2–4 giờ</p></div></div>
+      <div class="ms-arrow"><i class="fas fa-arrow-right"></i></div>
+      <div class="mini-step"><div class="ms-num">04</div><div><b>Nhận tiền</b><p>Thanh toán an toàn 100%</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="sell-layout">
+
+  <!-- FORM WRAPPER -->
+  <div class="sell-form-wrap">
+
+    <!-- STEP INDICATOR -->
+    <div class="step-indicator">
+      <div class="step-item active" id="step-ind-1">
+        <div class="step-circle">
+          <i class="fas fa-box-open"></i>
+          <span class="step-num-label">1</span>
+        </div>
+        <span>Thông tin sản phẩm</span>
+      </div>
+      <div class="step-line" id="line-1"></div>
+      <div class="step-item" id="step-ind-2">
+        <div class="step-circle">
+          <i class="fas fa-camera"></i>
+          <span class="step-num-label">2</span>
+        </div>
+        <span>Hình ảnh</span>
+      </div>
+      <div class="step-line" id="line-2"></div>
+      <div class="step-item" id="step-ind-3">
+        <div class="step-circle">
+          <i class="fas fa-tag"></i>
+          <span class="step-num-label">3</span>
+        </div>
+        <span>Giá & Bảo hành</span>
+      </div>
+      <div class="step-line" id="line-3"></div>
+      <div class="step-item" id="step-ind-4">
+        <div class="step-circle">
+          <i class="fas fa-check"></i>
+          <span class="step-num-label">4</span>
+        </div>
+        <span>Xác nhận</span>
+      </div>
+    </div>
+
+    <!-- ============================
+         STEP 1: THÔNG TIN SẢN PHẨM
+    ============================ -->
+    <div class="sell-step" id="sellStep1">
+      <div class="step-header">
+        <div class="step-icon-wrap"><i class="fas fa-box-open"></i></div>
+        <div>
+          <h2>Thông tin sản phẩm</h2>
+          <p>Mô tả chi tiết giúp sản phẩm bán nhanh hơn</p>
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="sf-group" id="g-title">
+          <label>Tên sản phẩm <span class="req">*</span></label>
+          <input type="text" id="f-title" placeholder="VD: Intel Core i7-10700K Socket LGA1200" oninput="clearSFError('g-title'); updatePreview()">
+          <span class="sf-error" id="e-title"></span>
+        </div>
+        <div class="sf-group" id="g-cat">
+          <label>Danh mục <span class="req">*</span></label>
+          <select id="f-cat" onchange="clearSFError('g-cat'); updatePreview()">
+            <option value="">-- Chọn danh mục --</option>
+            <option value="CPU">🔲 CPU / Bộ xử lý</option>
+            <option value="RAM">🧩 RAM / Bộ nhớ</option>
+            <option value="GPU">🖥️ Card màn hình</option>
+            <option value="Mainboard">🔌 Mainboard</option>
+            <option value="SSD">💾 SSD / HDD</option>
+            <option value="Nguồn">⚡ Nguồn máy tính</option>
+            <option value="Case">🗃️ Case / Vỏ máy</option>
+            <option value="Tản nhiệt">❄️ Tản nhiệt</option>
+            <option value="Màn hình">🖥 Màn hình</option>
+            <option value="Khác">📦 Khác</option>
+          </select>
+          <span class="sf-error" id="e-cat"></span>
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="sf-group" id="g-brand">
+          <label>Thương hiệu <span class="req">*</span></label>
+          <select id="f-brand" onchange="clearSFError('g-brand'); updatePreview()">
+            <option value="">-- Chọn thương hiệu --</option>
+            <option>Intel</option><option>AMD</option><option>NVIDIA</option>
+            <option>ASUS</option><option>MSI</option><option>Gigabyte</option>
+            <option>Kingston</option><option>Samsung</option><option>WD</option>
+            <option>Seagate</option><option>Corsair</option><option>Crucial</option>
+            <option>Cooler Master</option><option>Noctua</option><option>Khác</option>
+          </select>
+          <span class="sf-error" id="e-brand"></span>
+        </div>
+        <div class="sf-group" id="g-origin">
+          <label>Xuất xứ</label>
+          <select id="f-origin" onchange="updatePreview()">
+            <option value="">-- Chọn --</option>
+            <option>Mỹ</option><option>Nhật</option><option>Đài Loan</option>
+            <option>Hàn Quốc</option><option>Trung Quốc</option><option>Khác</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Tình trạng -->
+      <div class="sf-group" id="g-cond">
+        <label>Tình trạng sản phẩm <span class="req">*</span></label>
+        <div class="cond-options">
+          <label class="cond-card" id="cond-like-new">
+            <input type="radio" name="condition" value="like-new" onchange="selectCond(this)">
+            <div class="cond-bar-preview great"></div>
+            <span class="cond-pct">90–100%</span>
+            <span class="cond-label">Như mới</span>
+            <p>Hầu như chưa sử dụng, còn đầy đủ phụ kiện</p>
+            <div class="cond-check"><i class="fas fa-check"></i></div>
+          </label>
+          <label class="cond-card" id="cond-good">
+            <input type="radio" name="condition" value="good" onchange="selectCond(this)">
+            <div class="cond-bar-preview good"></div>
+            <span class="cond-pct">75–89%</span>
+            <span class="cond-label">Còn tốt</span>
+            <p>Đã sử dụng, còn hoạt động bình thường</p>
+            <div class="cond-check"><i class="fas fa-check"></i></div>
+          </label>
+          <label class="cond-card" id="cond-fair">
+            <input type="radio" name="condition" value="fair" onchange="selectCond(this)">
+            <div class="cond-bar-preview fair"></div>
+            <span class="cond-pct">60–74%</span>
+            <span class="cond-label">Bình thường</span>
+            <p>Có dấu hiệu sử dụng, vẫn hoạt động</p>
+            <div class="cond-check"><i class="fas fa-check"></i></div>
+          </label>
+        </div>
+        <span class="sf-error" id="e-cond"></span>
+      </div>
+
+      <!-- Mô tả -->
+      <div class="sf-group" id="g-desc">
+        <label>Mô tả chi tiết <span class="req">*</span></label>
+        <div class="textarea-wrap">
+          <textarea id="f-desc" rows="5" maxlength="1000"
+            placeholder="Mô tả tình trạng thực tế, lý do bán, thông số kỹ thuật, thời gian đã sử dụng..."
+            oninput="clearSFError('g-desc'); updateCharCount(); updatePreview()"></textarea>
+          <span class="char-count" id="charCount">0 / 1000</span>
+        </div>
+        <span class="sf-error" id="e-desc"></span>
+      </div>
+
+      <!-- Thời gian sử dụng -->
+      <div class="form-row-2">
+        <div class="sf-group">
+          <label>Thời gian đã sử dụng</label>
+          <select id="f-used" onchange="updatePreview()">
+            <option value="">-- Chọn --</option>
+            <option>Dưới 1 tháng</option><option>1–3 tháng</option>
+            <option>3–6 tháng</option><option>6–12 tháng</option>
+            <option>1–2 năm</option><option>Trên 2 năm</option>
+          </select>
+        </div>
+        <div class="sf-group">
+          <label>Số lượng</label>
+          <div class="qty-wrap">
+            <button type="button" onclick="changeQty(-1)">−</button>
+            <input type="number" id="f-qty" value="1" min="1" max="99" readonly>
+            <button type="button" onclick="changeQty(1)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-actions">
+        <div></div>
+        <button class="btn-next" onclick="goStep(2)">Tiếp theo <i class="fas fa-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <!-- ============================
+         STEP 2: HÌNH ẢNH
+    ============================ -->
+    <div class="sell-step hidden" id="sellStep2">
+      <div class="step-header">
+        <div class="step-icon-wrap orange"><i class="fas fa-camera"></i></div>
+        <div>
+          <h2>Hình ảnh sản phẩm</h2>
+          <p>Ảnh rõ nét giúp tăng tỉ lệ bán hàng lên 3 lần</p>
+        </div>
+      </div>
+
+      <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()"
+           ondragover="event.preventDefault();this.classList.add('dragging')"
+           ondragleave="this.classList.remove('dragging')"
+           ondrop="handleDrop(event)">
+        <i class="fas fa-cloud-upload-alt"></i>
+        <h3>Kéo thả ảnh vào đây</h3>
+        <p>hoặc click để chọn file</p>
+        <span class="upload-hint">PNG, JPG, WEBP — Tối đa 5 ảnh, mỗi ảnh &lt; 5MB</span>
+        <input type="file" id="fileInput" multiple accept="image/*" style="display:none" onchange="handleFileSelect(event)">
+      </div>
+
+      <div class="photo-tips">
+        <div class="tip-item"><i class="fas fa-sun"></i><span>Chụp nơi sáng</span></div>
+        <div class="tip-item"><i class="fas fa-expand"></i><span>Chụp toàn cảnh</span></div>
+        <div class="tip-item"><i class="fas fa-search-plus"></i><span>Cận cảnh chi tiết</span></div>
+        <div class="tip-item"><i class="fas fa-exclamation-triangle"></i><span>Chụp điểm lỗi (nếu có)</span></div>
+      </div>
+
+      <!-- Emoji picker thay thế upload thực -->
+      <div class="emoji-picker-section">
+        <p class="emoji-picker-label">Hoặc chọn icon đại diện cho sản phẩm:</p>
+        <div class="emoji-grid" id="emojiGrid"></div>
+      </div>
+
+      <div class="image-preview-grid" id="imagePreviewGrid"></div>
+
+      <div class="step-actions">
+        <button class="btn-back" onclick="goStep(1)"><i class="fas fa-arrow-left"></i> Quay lại</button>
+        <button class="btn-next" onclick="goStep(3)">Tiếp theo <i class="fas fa-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <!-- ============================
+         STEP 3: GIÁ & BẢO HÀNH
+    ============================ -->
+    <div class="sell-step hidden" id="sellStep3">
+      <div class="step-header">
+        <div class="step-icon-wrap green"><i class="fas fa-tag"></i></div>
+        <div>
+          <h2>Giá bán & Bảo hành</h2>
+          <p>Đặt giá hợp lý để bán nhanh hơn</p>
+        </div>
+      </div>
+
+      <!-- Gợi ý giá thị trường -->
+      <div class="market-price-box" id="marketPriceBox" style="display:none;">
+        <div class="mp-label"><i class="fas fa-chart-line"></i> Giá thị trường tham khảo</div>
+        <div class="mp-range">
+          <span id="mpLow">—</span>
+          <div class="mp-bar">
+            <div class="mp-fill" id="mpFill"></div>
+            <div class="mp-thumb" id="mpThumb"></div>
+          </div>
+          <span id="mpHigh">—</span>
+        </div>
+        <p id="mpHint" class="mp-hint"></p>
+      </div>
+
+      <div class="form-row-2">
+        <div class="sf-group" id="g-price">
+          <label>Giá bán <span class="req">*</span></label>
+          <div class="price-input-wrap">
+            <input type="number" id="f-price" placeholder="0" min="0"
+              oninput="clearSFError('g-price'); formatPriceInput(); updatePreview(); updateMarketHint()">
+            <span class="price-unit">₫</span>
+          </div>
+          <span class="price-formatted" id="priceFormatted"></span>
+          <span class="sf-error" id="e-price"></span>
+        </div>
+        <div class="sf-group">
+          <label>Giá gốc (không bắt buộc)</label>
+          <div class="price-input-wrap">
+            <input type="number" id="f-oldprice" placeholder="0" min="0" oninput="formatOldPriceInput(); updatePreview()">
+            <span class="price-unit">₫</span>
+          </div>
+          <span class="price-formatted" id="oldPriceFormatted"></span>
+        </div>
+      </div>
+
+      <!-- Thương lượng -->
+      <label class="toggle-option">
+        <input type="checkbox" id="f-negotiate" onchange="updatePreview()">
+        <span class="toggle-slider"></span>
+        <span>Cho phép thương lượng giá</span>
+      </label>
+
+      <div class="form-row-2" style="margin-top:1.5rem;">
+        <div class="sf-group" id="g-warranty">
+          <label>Bảo hành còn lại <span class="req">*</span></label>
+          <select id="f-warranty" onchange="clearSFError('g-warranty'); updatePreview()">
+            <option value="">-- Chọn --</option>
+            <option value="0">Không bảo hành</option>
+            <option value="1">1 tháng</option>
+            <option value="2">2 tháng</option>
+            <option value="3">3 tháng</option>
+            <option value="6">6 tháng</option>
+            <option value="12">12 tháng</option>
+          </select>
+          <span class="sf-error" id="e-warranty"></span>
+        </div>
+        <div class="sf-group">
+          <label>Hình thức giao hàng</label>
+          <div class="ship-options">
+            <label class="ship-opt active" id="ship-both">
+              <input type="radio" name="shipping" value="both" checked onchange="selectShip(this)">
+              <i class="fas fa-handshake"></i> Gặp trực tiếp & Ship
+            </label>
+            <label class="ship-opt" id="ship-direct">
+              <input type="radio" name="shipping" value="direct" onchange="selectShip(this)">
+              <i class="fas fa-map-marker-alt"></i> Gặp trực tiếp
+            </label>
+            <label class="ship-opt" id="ship-ship">
+              <input type="radio" name="shipping" value="ship" onchange="selectShip(this)">
+              <i class="fas fa-truck"></i> Ship toàn quốc
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Địa điểm -->
+      <div class="form-row-2">
+        <div class="sf-group" id="g-city">
+          <label>Tỉnh / Thành phố <span class="req">*</span></label>
+          <select id="f-city" onchange="clearSFError('g-city'); updatePreview()">
+            <option value="">-- Chọn --</option>
+            <option>Hà Nội</option><option>TP. Hồ Chí Minh</option>
+            <option>Đà Nẵng</option><option>Cần Thơ</option>
+            <option>Hải Phòng</option><option>Bình Dương</option>
+            <option>Đồng Nai</option><option>Khác</option>
+          </select>
+          <span class="sf-error" id="e-city"></span>
+        </div>
+        <div class="sf-group">
+          <label>Quận / Huyện</label>
+          <input type="text" id="f-district" placeholder="VD: Quận 1, Cầu Giấy..." oninput="updatePreview()">
+        </div>
+      </div>
+
+      <!-- Liên hệ -->
+      <div class="sf-group" id="g-phone">
+        <label>Số điện thoại liên hệ <span class="req">*</span></label>
+        <div class="input-with-icon">
+          <i class="fas fa-phone"></i>
+          <input type="tel" id="f-phone" placeholder="0901 234 567" oninput="clearSFError('g-phone')">
+        </div>
+        <span class="sf-error" id="e-phone"></span>
+      </div>
+
+      <div class="step-actions">
+        <button class="btn-back" onclick="goStep(2)"><i class="fas fa-arrow-left"></i> Quay lại</button>
+        <button class="btn-next" onclick="goStep(4)">Xem trước & Đăng <i class="fas fa-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <!-- ============================
+         STEP 4: XÁC NHẬN / PREVIEW
+    ============================ -->
+    <div class="sell-step hidden" id="sellStep4">
+      <div class="step-header">
+        <div class="step-icon-wrap purple"><i class="fas fa-eye"></i></div>
+        <div>
+          <h2>Xem trước & Xác nhận</h2>
+          <p>Kiểm tra lại thông tin trước khi đăng bán</p>
+        </div>
+      </div>
+
+      <!-- Preview card -->
+      <div class="preview-section">
+        <h3 class="preview-title"><i class="fas fa-store"></i> Tin đăng của bạn sẽ hiển thị như thế này:</h3>
+        <div class="preview-card" id="previewCard">
+          <div class="preview-card-img" id="pvImg">📦</div>
+          <div class="preview-card-body">
+            <div class="preview-cat" id="pvCat">Danh mục</div>
+            <div class="preview-name" id="pvName">Tên sản phẩm</div>
+            <div class="preview-specs" id="pvSpecs"></div>
+            <div class="preview-footer">
+              <div>
+                <div class="preview-price" id="pvPrice">—</div>
+                <div class="preview-old-price" id="pvOldPrice"></div>
+              </div>
+              <div class="preview-badge-wrap">
+                <span class="preview-badge" id="pvCondBadge">—</span>
+                <span class="preview-badge blue" id="pvWarranty"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="confirm-summary">
+        <div class="cs-row"><span><i class="fas fa-box"></i> Tên sản phẩm</span><strong id="cs-title">—</strong></div>
+        <div class="cs-row"><span><i class="fas fa-th-large"></i> Danh mục</span><strong id="cs-cat">—</strong></div>
+        <div class="cs-row"><span><i class="fas fa-award"></i> Thương hiệu</span><strong id="cs-brand">—</strong></div>
+        <div class="cs-row"><span><i class="fas fa-heartbeat"></i> Tình trạng</span><strong id="cs-cond">—</strong></div>
+        <div class="cs-row"><span><i class="fas fa-tag"></i> Giá bán</span><strong id="cs-price" style="color:var(--accent2);">—</strong></div>
+        <div class="cs-row"><span><i class="fas fa-shield-alt"></i> Bảo hành</span><strong id="cs-warranty">—</strong></div>
+        <div class="cs-row"><span><i class="fas fa-map-marker-alt"></i> Địa điểm</span><strong id="cs-city">—</strong></div>
+        <div class="cs-row"><span><i class="fas fa-truck"></i> Giao hàng</span><strong id="cs-ship">—</strong></div>
+      </div>
+
+      <!-- Terms -->
+      <label class="terms-confirm" id="g-terms">
+        <input type="checkbox" id="f-terms" onchange="clearSFError('g-terms')">
+        <span class="checkmark-box"></span>
+        Tôi xác nhận thông tin đúng sự thật và đồng ý với
+        <a href="#">Điều khoản đăng bán</a> của TechParts
+      </label>
+      <span class="sf-error" id="e-terms"></span>
+
+      <div class="step-actions">
+        <button class="btn-back" onclick="goStep(3)"><i class="fas fa-arrow-left"></i> Quay lại</button>
+        <button class="btn-submit-sell" id="btnSubmitSell" onclick="submitListing()">
+          <span class="btn-text"><i class="fas fa-paper-plane"></i> Đăng tin ngay</span>
+          <span class="btn-loader" style="display:none;"><i class="fas fa-spinner fa-spin"></i> Đang đăng...</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ============================
+         STEP 5: THÀNH CÔNG
+    ============================ -->
+    <div class="sell-step hidden" id="sellStep5">
+      <div class="success-state">
+        <div class="success-ring">
+          <i class="fas fa-check"></i>
+        </div>
+        <h2>Đăng tin thành công! 🎉</h2>
+        <p>Tin đăng của bạn đang được kiểm duyệt. Chúng tôi sẽ thông báo trong <strong>2–4 giờ</strong>.</p>
+        <div class="success-info-box">
+          <div class="sib-row"><i class="fas fa-hashtag"></i> Mã tin: <strong id="listingCode">TP-000000</strong></div>
+          <div class="sib-row"><i class="fas fa-box"></i> Sản phẩm: <strong id="listingTitle">—</strong></div>
+          <div class="sib-row"><i class="fas fa-tag"></i> Giá: <strong id="listingPrice">—</strong></div>
+          <div class="sib-row"><i class="fas fa-clock"></i> Dự kiến duyệt: <strong>Trong 2–4 giờ</strong></div>
+        </div>
+        <div class="success-actions">
+          <a href="sell.html" class="btn-next" style="text-decoration:none;">
+            <i class="fas fa-plus"></i> Đăng tin khác
+          </a>
+          <a href="shop.html" class="btn-back" style="text-decoration:none;">
+            <i class="fas fa-store"></i> Xem cửa hàng
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /sell-form-wrap -->
+
+  <!-- SIDEBAR TIPS -->
+  <aside class="sell-tips">
+    <div class="tips-card">
+      <h4><i class="fas fa-lightbulb"></i> Mẹo đăng bán hiệu quả</h4>
+      <ul class="tips-list">
+        <li><i class="fas fa-check-circle"></i> Đặt tên đầy đủ: tên + model + thông số chính</li>
+        <li><i class="fas fa-check-circle"></i> Chụp ít nhất 3–5 ảnh rõ nét, nhiều góc</li>
+        <li><i class="fas fa-check-circle"></i> Mô tả trung thực tình trạng thực tế</li>
+        <li><i class="fas fa-check-circle"></i> Giá hợp lý: thấp hơn 20–30% giá mới</li>
+        <li><i class="fas fa-check-circle"></i> Ghi rõ thời gian đã sử dụng</li>
+        <li><i class="fas fa-check-circle"></i> Phản hồi tin nhắn nhanh = bán nhanh hơn</li>
+      </ul>
+    </div>
+
+    <div class="tips-card" style="margin-top:1rem;">
+      <h4><i class="fas fa-shield-alt"></i> Cam kết của TechParts</h4>
+      <ul class="tips-list">
+        <li><i class="fas fa-lock" style="color:var(--success);"></i> Thanh toán an toàn, có escrow</li>
+        <li><i class="fas fa-headset" style="color:var(--success);"></i> Hỗ trợ giải quyết tranh chấp 24/7</li>
+        <li><i class="fas fa-percent" style="color:var(--success);"></i> 0% phí đăng bán cho người bán mới</li>
+        <li><i class="fas fa-users" style="color:var(--success);"></i> Cộng đồng 50,000+ người mua</li>
+      </ul>
+    </div>
+
+    <!-- Progress tracker -->
+    <div class="tips-card progress-tracker" style="margin-top:1rem;" id="progressTracker">
+      <h4><i class="fas fa-tasks"></i> Tiến độ hoàn thành</h4>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progressFill" style="width:25%"></div>
+      </div>
+      <p id="progressLabel" style="font-size:0.8rem;color:var(--text-muted);margin-top:0.5rem;">Bước 1/4 — Thông tin sản phẩm</p>
+    </div>
+  </aside>
+
+</div><!-- /sell-layout -->
+
+<script src="sell.js"></script>
+</body>
+</html>

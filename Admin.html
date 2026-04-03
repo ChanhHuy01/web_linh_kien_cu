@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel – ITC</title>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg:        #0d0f14;
+      --surface:   #13161e;
+      --surface2:  #1a1e29;
+      --border:    rgba(255,255,255,0.07);
+      --accent:    #22c55e;
+      --accent2:   #f97316;
+      --accent3:   #3b82f6;
+      --danger:    #ef4444;
+      --warning:   #f59e0b;
+      --text:      #f1f5f9;
+      --text-muted:#64748b;
+      --sidebar-w: 240px;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Be Vietnam Pro',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; display:flex; }
+
+    /* SIDEBAR */
+    .sidebar {
+      width:var(--sidebar-w); background:var(--surface);
+      border-right:1px solid var(--border);
+      display:flex; flex-direction:column;
+      position:fixed; top:0; left:0; height:100vh; z-index:100;
+    }
+    .sidebar-logo {
+      padding:22px 20px 18px; border-bottom:1px solid var(--border);
+      display:flex; align-items:center; gap:10px;
+    }
+    .logo-box {
+      width:36px; height:36px; background:var(--accent); border-radius:10px;
+      display:flex; align-items:center; justify-content:center;
+      font-weight:900; font-size:14px; color:#fff;
+    }
+    .sidebar-logo h2 { font-size:16px; font-weight:800; }
+    .sidebar-logo span { font-size:11px; color:var(--text-muted); display:block; }
+    .sidebar-nav { flex:1; padding:16px 10px; overflow-y:auto; }
+    .nav-label {
+      font-size:10px; font-weight:700; color:var(--text-muted);
+      letter-spacing:.08em; text-transform:uppercase; padding:12px 10px 6px;
+    }
+    .nav-item {
+      display:flex; align-items:center; gap:10px;
+      padding:10px 12px; border-radius:10px; cursor:pointer;
+      font-size:13.5px; font-weight:500; color:var(--text-muted);
+      transition:all .18s; margin-bottom:2px; text-decoration:none;
+      border:none; background:none; width:100%; text-align:left; font-family:inherit;
+    }
+    .nav-item:hover { background:var(--surface2); color:var(--text); }
+    .nav-item.active { background:rgba(34,197,94,.12); color:var(--accent); }
+    .nav-item .ico { width:18px; text-align:center; font-size:14px; }
+    .nav-badge {
+      margin-left:auto; background:var(--danger); color:#fff;
+      font-size:10px; font-weight:700; padding:2px 7px; border-radius:100px;
+      min-width:20px; text-align:center;
+    }
+    .sidebar-footer { padding:14px 10px; border-top:1px solid var(--border); }
+    .admin-info {
+      display:flex; align-items:center; gap:10px;
+      padding:10px 12px; border-radius:10px; background:var(--surface2);
+    }
+    .admin-avatar {
+      width:32px; height:32px; border-radius:50%;
+      background:linear-gradient(135deg,var(--accent),#16a34a);
+      display:flex; align-items:center; justify-content:center;
+      font-size:13px; font-weight:700; color:#fff; flex-shrink:0;
+    }
+    .admin-name { font-size:12.5px; font-weight:600; }
+    .admin-role { font-size:10.5px; color:var(--accent); }
+    .logout-btn {
+      margin-left:auto; background:none; border:none; color:var(--text-muted);
+      cursor:pointer; font-size:15px; padding:4px; transition:color .2s;
+    }
+    .logout-btn:hover { color:var(--danger); }
+
+    /* MAIN */
+    .main { margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; }
+    .topbar {
+      background:var(--surface); border-bottom:1px solid var(--border);
+      padding:0 28px; height:60px;
+      display:flex; align-items:center; justify-content:space-between;
+      position:sticky; top:0; z-index:50;
+    }
+    .topbar-title { font-size:16px; font-weight:700; }
+    .search-wrap {
+      display:flex; align-items:center; gap:8px;
+      background:var(--surface2); border:1px solid var(--border);
+      border-radius:9px; padding:7px 14px;
+    }
+    .search-wrap input {
+      background:none; border:none; outline:none; color:var(--text);
+      font-family:inherit; font-size:13px; width:200px;
+    }
+    .search-wrap input::placeholder { color:var(--text-muted); }
+    .search-wrap i { color:var(--text-muted); font-size:13px; }
+
+    .content { padding:28px; flex:1; }
+
+    /* TAB PANELS */
+    .tab-panel { display:none; animation:fadeIn .25s ease; }
+    .tab-panel.active { display:block; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+    /* STATS */
+    .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+    .stat-card {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:14px; padding:20px 18px;
+      display:flex; align-items:center; gap:14px;
+    }
+    .stat-ico {
+      width:46px; height:46px; border-radius:12px;
+      display:flex; align-items:center; justify-content:center; font-size:19px; flex-shrink:0;
+    }
+    .stat-ico.g { background:rgba(34,197,94,.12);  color:var(--accent); }
+    .stat-ico.o { background:rgba(249,115,22,.12); color:var(--accent2); }
+    .stat-ico.b { background:rgba(59,130,246,.12); color:var(--accent3); }
+    .stat-ico.r { background:rgba(239,68,68,.12);  color:var(--danger); }
+    .stat-val { font-size:24px; font-weight:800; line-height:1; }
+    .stat-lbl { font-size:12px; color:var(--text-muted); margin-top:3px; }
+
+    /* TABLE CARD */
+    .tcard { background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
+    .thead-row {
+      padding:18px 22px; display:flex; align-items:center; justify-content:space-between;
+      border-bottom:1px solid var(--border);
+    }
+    .thead-row h3 { font-size:15px; font-weight:700; }
+    .thead-row p  { font-size:12px; color:var(--text-muted); margin-top:2px; }
+    .thead-actions { display:flex; gap:8px; align-items:center; }
+
+    .fsel {
+      background:var(--surface2); border:1px solid var(--border);
+      color:var(--text); border-radius:8px; padding:7px 10px;
+      font-family:inherit; font-size:12.5px; outline:none; cursor:pointer;
+    }
+    .btn-ref {
+      background:var(--surface2); border:1px solid var(--border);
+      color:var(--text-muted); border-radius:8px; padding:7px 13px;
+      font-family:inherit; font-size:12.5px; cursor:pointer; transition:all .2s;
+      display:flex; align-items:center; gap:6px;
+    }
+    .btn-ref:hover { color:var(--text); border-color:rgba(255,255,255,.18); }
+
+    table { width:100%; border-collapse:collapse; }
+    th {
+      padding:10px 16px; text-align:left; font-size:11px; font-weight:700;
+      color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em;
+      border-bottom:1px solid var(--border); background:rgba(255,255,255,.02);
+    }
+    td {
+      padding:12px 16px; font-size:13px;
+      border-bottom:1px solid var(--border); vertical-align:middle;
+    }
+    tr:last-child td { border-bottom:none; }
+    tr:hover td { background:rgba(255,255,255,.02); }
+
+    .badge {
+      display:inline-flex; align-items:center; gap:4px;
+      padding:3px 10px; border-radius:100px; font-size:11px; font-weight:600;
+    }
+    .badge.pending   { background:rgba(245,158,11,.12); color:var(--warning); }
+    .badge.active    { background:rgba(34,197,94,.12);  color:var(--accent); }
+    .badge.sold      { background:rgba(59,130,246,.12); color:var(--accent3); }
+    .badge.rejected  { background:rgba(239,68,68,.12);  color:var(--danger); }
+    .badge.confirmed { background:rgba(34,197,94,.12);  color:var(--accent); }
+    .badge.done      { background:rgba(59,130,246,.12); color:var(--accent3); }
+    .badge.cancelled { background:rgba(239,68,68,.12);  color:var(--danger); }
+    .badge.admin     { background:rgba(249,115,22,.12); color:var(--accent2); }
+    .badge.user      { background:rgba(59,130,246,.12); color:var(--accent3); }
+    .badge.seller    { background:rgba(139,92,246,.12); color:#a78bfa; }
+    .badge.buyer     { background:rgba(34,197,94,.12);  color:var(--accent); }
+
+    .act-btns { display:flex; gap:5px; flex-wrap:wrap; }
+    .btn-a {
+      padding:5px 10px; border-radius:7px; border:none; cursor:pointer;
+      font-size:11.5px; font-weight:600; font-family:inherit;
+      transition:all .18s; display:flex; align-items:center; gap:4px;
+    }
+    .ba-approve { background:rgba(34,197,94,.1);  color:var(--accent); }
+    .ba-approve:hover { background:rgba(34,197,94,.25); }
+    .ba-reject  { background:rgba(239,68,68,.1);  color:var(--danger); }
+    .ba-reject:hover  { background:rgba(239,68,68,.25); }
+    .ba-done    { background:rgba(59,130,246,.1); color:var(--accent3); }
+    .ba-done:hover    { background:rgba(59,130,246,.25); }
+    .ba-del     { background:rgba(239,68,68,.08); color:var(--danger); }
+    .ba-del:hover     { background:rgba(239,68,68,.2); }
+
+    .empty-cell { text-align:center; padding:50px 20px; color:var(--text-muted); }
+    .empty-cell i { font-size:36px; display:block; margin-bottom:10px; opacity:.35; }
+    .empty-cell p { font-size:13.5px; }
+    .loading-cell { text-align:center; padding:40px; color:var(--text-muted); font-size:13px; }
+
+    .tfoot { padding:14px 22px; display:flex; align-items:center; justify-content:space-between; border-top:1px solid var(--border); }
+    .tfoot span { font-size:12.5px; color:var(--text-muted); }
+
+    /* TOAST */
+    .toast {
+      position:fixed; bottom:24px; right:24px; z-index:9999;
+      background:var(--surface2); border:1px solid var(--border);
+      border-radius:12px; padding:13px 18px;
+      display:flex; align-items:center; gap:10px; font-size:13.5px; font-weight:500;
+      box-shadow:0 8px 30px rgba(0,0,0,.4);
+      transform:translateY(80px); opacity:0;
+      transition:all .3s cubic-bezier(.34,1.4,.64,1); pointer-events:none;
+    }
+    .toast.show { transform:translateY(0); opacity:1; pointer-events:auto; }
+    .toast.ok  { border-color:rgba(34,197,94,.3); }
+    .toast.err { border-color:rgba(239,68,68,.3); }
+
+    @media(max-width:900px){
+      .stats-grid { grid-template-columns:1fr 1fr; }
+      .main { margin-left:0; }
+      .sidebar { display:none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-box">ITC</div>
+    <div><h2>Admin Panel</h2><span>Quản lý hệ thống</span></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-label">Tổng quan</div>
+    <button class="nav-item active" onclick="showTab('dashboard')">
+      <span class="ico"><i class="fas fa-chart-pie"></i></span> Dashboard
+    </button>
+    <div class="nav-label">Quản lý</div>
+    <button class="nav-item" onclick="showTab('listings')">
+      <span class="ico"><i class="fas fa-tags"></i></span> Tin đăng bán
+      <span class="nav-badge" id="badge-listings">0</span>
+    </button>
+    <button class="nav-item" onclick="showTab('inspections')">
+      <span class="ico"><i class="fas fa-tools"></i></span> Lịch kiểm tra
+      <span class="nav-badge" id="badge-inspections">0</span>
+    </button>
+    <button class="nav-item" onclick="showTab('users')">
+      <span class="ico"><i class="fas fa-users"></i></span> Người dùng
+    </button>
+    <div class="nav-label">Khác</div>
+    <a class="nav-item" href="index.html">
+      <span class="ico"><i class="fas fa-home"></i></span> Về trang chủ
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="admin-info">
+      <div class="admin-avatar" id="adminAvatar">A</div>
+      <div>
+        <div class="admin-name" id="adminName">Admin</div>
+        <div class="admin-role">Quản trị viên</div>
+      </div>
+      <button class="logout-btn" onclick="logout()" title="Đăng xuất"><i class="fas fa-sign-out-alt"></i></button>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbarTitle">Dashboard</div>
+    <div class="search-wrap">
+      <i class="fas fa-search"></i>
+      <input type="text" placeholder="Tìm kiếm..." id="searchInput" oninput="handleSearch()">
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="tab-panel active" id="tab-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-ico g"><i class="fas fa-tags"></i></div><div><div class="stat-val" id="s-listings">–</div><div class="stat-lbl">Tin đăng bán</div></div></div>
+        <div class="stat-card"><div class="stat-ico o"><i class="fas fa-tools"></i></div><div><div class="stat-val" id="s-inspections">–</div><div class="stat-lbl">Lịch kiểm tra</div></div></div>
+        <div class="stat-card"><div class="stat-ico b"><i class="fas fa-users"></i></div><div><div class="stat-val" id="s-users">–</div><div class="stat-lbl">Người dùng</div></div></div>
+        <div class="stat-card"><div class="stat-ico r"><i class="fas fa-clock"></i></div><div><div class="stat-val" id="s-pending">–</div><div class="stat-lbl">Chờ duyệt</div></div></div>
+      </div>
+      <div class="tcard">
+        <div class="thead-row">
+          <div><h3>Tin đăng gần đây</h3><p>5 tin mới nhất</p></div>
+          <button class="btn-ref" onclick="loadDashboard()"><i class="fas fa-sync-alt"></i> Làm mới</button>
+        </div>
+        <table>
+          <thead><tr><th>Sản phẩm</th><th>Danh mục</th><th>Giá</th><th>Trạng thái</th><th>Ngày đăng</th></tr></thead>
+          <tbody id="recent-body"><tr><td colspan="5" class="loading-cell"><i class="fas fa-spinner fa-spin"></i> Đang tải...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- LISTINGS -->
+    <div class="tab-panel" id="tab-listings">
+      <div class="tcard">
+        <div class="thead-row">
+          <div><h3>Quản lý tin đăng bán</h3><p id="listings-count">Đang tải...</p></div>
+          <div class="thead-actions">
+            <select class="fsel" id="listings-filter" onchange="loadListings()">
+              <option value="">Tất cả</option>
+              <option value="pending">Chờ duyệt</option>
+              <option value="active">Đã duyệt</option>
+              <option value="rejected">Từ chối</option>
+              <option value="sold">Đã bán</option>
+            </select>
+            <button class="btn-ref" onclick="loadListings()"><i class="fas fa-sync-alt"></i> Làm mới</button>
+          </div>
+        </div>
+        <table>
+          <thead><tr><th>Sản phẩm</th><th>Danh mục</th><th>Tình trạng</th><th>Giá</th><th>Địa điểm</th><th>Trạng thái</th><th>Ngày đăng</th><th>Thao tác</th></tr></thead>
+          <tbody id="listings-body"><tr><td colspan="8" class="loading-cell"><i class="fas fa-spinner fa-spin"></i> Đang tải...</td></tr></tbody>
+        </table>
+        <div class="tfoot"><span id="listings-info">–</span></div>
+      </div>
+    </div>
+
+    <!-- INSPECTIONS -->
+    <div class="tab-panel" id="tab-inspections">
+      <div class="tcard">
+        <div class="thead-row">
+          <div><h3>Quản lý lịch kiểm tra</h3><p id="inspections-count">Đang tải...</p></div>
+          <div class="thead-actions">
+            <select class="fsel" id="inspections-filter" onchange="loadInspections()">
+              <option value="">Tất cả</option>
+              <option value="pending">Chờ xác nhận</option>
+              <option value="confirmed">Đã xác nhận</option>
+              <option value="done">Hoàn thành</option>
+              <option value="cancelled">Huỷ</option>
+            </select>
+            <button class="btn-ref" onclick="loadInspections()"><i class="fas fa-sync-alt"></i> Làm mới</button>
+          </div>
+        </div>
+        <table>
+          <thead><tr><th>Mã lịch</th><th>Khách hàng</th><th>SĐT</th><th>Linh kiện</th><th>Ngày hẹn</th><th>Khung giờ</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+          <tbody id="inspections-body"><tr><td colspan="8" class="loading-cell"><i class="fas fa-spinner fa-spin"></i> Đang tải...</td></tr></tbody>
+        </table>
+        <div class="tfoot"><span id="inspections-info">–</span></div>
+      </div>
+    </div>
+
+    <!-- USERS -->
+    <div class="tab-panel" id="tab-users">
+      <div class="tcard">
+        <div class="thead-row">
+          <div><h3>Quản lý người dùng</h3><p id="users-count">Đang tải...</p></div>
+          <button class="btn-ref" onclick="loadUsers()"><i class="fas fa-sync-alt"></i> Làm mới</button>
+        </div>
+        <table>
+          <thead><tr><th>Họ tên</th><th>Email</th><th>SĐT</th><th>Loại TK</th><th>Vai trò</th><th>Ngày tạo</th><th>Thao tác</th></tr></thead>
+          <tbody id="users-body"><tr><td colspan="7" class="loading-cell"><i class="fas fa-spinner fa-spin"></i> Đang tải...</td></tr></tbody>
+        </table>
+        <div class="tfoot"><span id="users-info">–</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <i id="toast-icon" class="fas fa-check-circle" style="color:var(--accent)"></i>
+  <span id="toast-msg">Thông báo</span>
+</div>
+
+<script>
+/* ── SUPABASE ── */
+const SUPABASE_URL = 'https://frvjsvbyhvmohfagxxgb.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZydmpzdmJ5aHZtb2hmYWd4eGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5NDQ3NzEsImV4cCI6MjA5MDUyMDc3MX0.dpCfLm7zk8KmabL6q7lV9BtZ-9oTQmkZPQMZsG7Q2T0';
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* ── AUTH ── */
+const me = JSON.parse(sessionStorage.getItem('currentUser') || localStorage.getItem('currentUser') || 'null');
+if (!me || me.role !== 'admin') window.location.href = 'login.html';
+if (me) {
+  document.getElementById('adminName').textContent   = me.name || 'Admin';
+  document.getElementById('adminAvatar').textContent = (me.name || 'A')[0].toUpperCase();
+}
+function logout() {
+  sessionStorage.removeItem('currentUser');
+  localStorage.removeItem('currentUser');
+  window.location.href = 'login.html';
+}
+
+/* ── TOAST ── */
+function showToast(msg, ok = true) {
+  const el = document.getElementById('toast');
+  document.getElementById('toast-icon').style.color = ok ? 'var(--accent)' : 'var(--danger)';
+  document.getElementById('toast-icon').className = `fas ${ok ? 'fa-check-circle' : 'fa-times-circle'}`;
+  document.getElementById('toast-msg').textContent = msg;
+  el.className = `toast show ${ok ? 'ok' : 'err'}`;
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+/* ── TABS ── */
+const TABS = ['dashboard','listings','inspections','users'];
+function showTab(name) {
+  TABS.forEach(t => {
+    document.getElementById('tab-' + t).classList.toggle('active', t === name);
+    document.querySelectorAll('.nav-item')[TABS.indexOf(t)]?.classList.toggle('active', t === name);
+  });
+  document.getElementById('topbarTitle').textContent =
+    { dashboard:'Dashboard', listings:'Tin đăng bán', inspections:'Lịch kiểm tra', users:'Người dùng' }[name];
+  if (name === 'listings')    loadListings();
+  if (name === 'inspections') loadInspections();
+  if (name === 'users')       loadUsers();
+}
+
+/* ── HELPERS ── */
+const fmtPrice = p => p ? Number(p).toLocaleString('vi-VN') + '₫' : '–';
+const fmtDate  = d => d ? new Date(d).toLocaleDateString('vi-VN') : '–';
+const BADGE_MAP = {
+  pending:'⏳ Chờ duyệt', active:'✅ Đã duyệt', sold:'💰 Đã bán', rejected:'❌ Từ chối',
+  confirmed:'✅ Xác nhận', done:'🏁 Hoàn thành', cancelled:'❌ Huỷ',
+  admin:'🛡️ Admin', user:'👤 User', buyer:'🛒 Mua', seller:'🏪 Bán'
+};
+const badge = s => `<span class="badge ${s}">${BADGE_MAP[s] || s}</span>`;
+const COND_MAP = { 'like-new':'🌟 Like New','good':'👍 Tốt','fair':'🔄 Bình thường','parts':'🔩 Linh kiện' };
+
+/* ── DASHBOARD ── */
+async function loadDashboard() {
+  const [lRes, iRes, uRes, pRes, rRes] = await Promise.all([
+    db.from('listings').select('*',{count:'exact',head:true}),
+    db.from('inspections').select('*',{count:'exact',head:true}),
+    db.from('users').select('*',{count:'exact',head:true}),
+    db.from('listings').select('*',{count:'exact',head:true}).eq('status','pending'),
+    db.from('listings').select('id,title,category,price,status,created_at').order('created_at',{ascending:false}).limit(5)
+  ]);
+  document.getElementById('s-listings').textContent    = lRes.count ?? 0;
+  document.getElementById('s-inspections').textContent = iRes.count ?? 0;
+  document.getElementById('s-users').textContent       = uRes.count ?? 0;
+  document.getElementById('s-pending').textContent     = pRes.count ?? 0;
+  document.getElementById('badge-listings').textContent    = pRes.count ?? 0;
+
+  // Pending inspections badge
+  const { count: pi } = await db.from('inspections').select('*',{count:'exact',head:true}).eq('status','pending');
+  document.getElementById('badge-inspections').textContent = pi ?? 0;
+
+  const tbody = document.getElementById('recent-body');
+  const data  = rRes.data || [];
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-cell"><i class="fas fa-inbox"></i><p>Chưa có tin đăng nào</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.map(r => `<tr>
+    <td style="font-weight:600;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.title}</td>
+    <td>${r.category||'–'}</td>
+    <td style="font-weight:700;color:var(--accent)">${fmtPrice(r.price)}</td>
+    <td>${badge(r.status)}</td>
+    <td style="font-size:12px">${fmtDate(r.created_at)}</td>
+  </tr>`).join('');
+}
+
+/* ── LISTINGS ── */
+async function loadListings() {
+  document.getElementById('listings-body').innerHTML =
+    `<tr><td colspan="8" class="loading-cell"><i class="fas fa-spinner fa-spin"></i> Đang tải...</td></tr>`;
+  const filter = document.getElementById('listings-filter').value;
+  const search = document.getElementById('searchInput').value.trim();
+  let q = db.from('listings').select('*').order('created_at',{ascending:false});
+  if (filter) q = q.eq('status', filter);
+  if (search) q = q.ilike('title', `%${search}%`);
+  const { data, error } = await q;
+  if (error) { showToast('Lỗi tải dữ liệu', false); return; }
+  document.getElementById('listings-count').textContent = `${data.length} tin đăng`;
+  document.getElementById('listings-info').textContent  = `Hiển thị ${data.length} kết quả`;
+  const tbody = document.getElementById('listings-body');
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-cell"><i class="fas fa-tags"></i><p>Không có tin đăng nào</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.map(r => `<tr>
+    <td style="font-weight:600;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${r.title}">${r.title}</td>
+    <td style="font-size:12.5px">${r.category||'–'}</td>
+    <td style="font-size:12px">${COND_MAP[r.condition]||r.condition||'–'}</td>
+    <td style="font-weight:700;color:var(--accent)">${fmtPrice(r.price)}</td>
+    <td style="font-size:12px">${r.location||'–'}</td>
+    <td>${badge(r.status)}</td>
+    <td style="font-size:12px">${fmtDate(r.created_at)}</td>
+    <td><div class="act-btns">
+      ${r.status==='pending'?`
+        <button class="btn-a ba-approve" onclick="updListing('${r.id}','active')"><i class="fas fa-check"></i> Duyệt</button>
+        <button class="btn-a ba-reject"  onclick="updListing('${r.id}','rejected')"><i class="fas fa-times"></i></button>
+      `:''}
+      ${r.status==='active'?`<button class="btn-a ba-done" onclick="updListing('${r.id}','sold')"><i class="fas fa-tag"></i> Đã bán</button>`:''}
+      <button class="btn-a ba-del" onclick="delListing('${r.id}')"><i class="fas fa-trash"></i></button>
+    </div></td>
+  </tr>`).join('');
+}
+async function updListing(id, status) {
+  const { error } = await db.from('listings').update({status}).eq('id',id);
+  if (error) { showToast('Lỗi cập nhật', false); return; }
+  showToast(status==='active'?'✅ Đã duyệt tin':status==='rejected'?'❌ Đã từ chối':'💰 Đánh dấu đã bán');
+  loadListings(); loadDashboard();
+}
+async function delListing(id) {
+  if (!confirm('Xoá tin đăng này?')) return;
+  const { error } = await db.from('listings').delete().eq('id',id);
+  if (error) { showToast('Lỗi xoá', false); return; }
+  showToast('🗑️ Đã xoá tin đăng');
+  loadListings(); loadDashboard();
+}
+
+/* ── INSPECTIONS ── */
+async function loadInspections() {
+  document.getElementById('inspections-body').innerHTML =
+    `<tr><td colspan="8" class="loading-cell"><i class="fas fa-spinner fa-spin"></i> Đang tải...</td></tr>`;
+  const filter = document.getElementById('inspections-filter').value;
+  const search = document.getElementById('searchInput').value.trim();
+  let q = db.from('inspections').select('*').order('created_at',{ascending:false});
+  if (filter) q = q.eq('status', filter);
+  if (search) q = q.or(`name.ilike.%${search}%,phone.ilike.%${search}%,ref_code.ilike.%${search}%`);
+  const { data, error } = await q;
+  if (error) { showToast('Lỗi tải dữ liệu', false); return; }
+  document.getElementById('inspections-count').textContent = `${data.length} lịch hẹn`;
+  document.getElementById('inspections-info').textContent  = `Hiển thị ${data.length} kết quả`;
+  const tbody = document.getElementById('inspections-body');
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-cell"><i class="fas fa-tools"></i><p>Không có lịch hẹn nào</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.map(r => `<tr>
+    <td style="font-weight:700;color:var(--accent2);font-size:12px">${r.ref_code||'–'}</td>
+    <td style="font-weight:600">${r.name}</td>
+    <td style="font-size:12.5px">${r.phone}</td>
+    <td style="font-size:12.5px">${r.device_type}</td>
+    <td style="font-size:12.5px">${r.date?new Date(r.date).toLocaleDateString('vi-VN'):'–'}</td>
+    <td style="font-size:12px">${r.time_slot||'–'}</td>
+    <td>${badge(r.status)}</td>
+    <td><div class="act-btns">
+      ${r.status==='pending'?`
+        <button class="btn-a ba-approve" onclick="updInspection('${r.id}','confirmed')"><i class="fas fa-check"></i> Xác nhận</button>
+        <button class="btn-a ba-reject"  onclick="updInspection('${r.id}','cancelled')"><i class="fas fa-times"></i></button>
+      `:''}
+      ${r.status==='confirmed'?`<button class="btn-a ba-done" onclick="updInspection('${r.id}','done')"><i class="fas fa-flag-checkered"></i> Xong</button>`:''}
+      <button class="btn-a ba-del" onclick="delInspection('${r.id}')"><i class="fas fa-trash"></i></button>
+    </div></td>
+  </tr>`).join('');
+}
+async function updInspection(id, status) {
+  const { error } = await db.from('inspections').update({status}).eq('id',id);
+  if (error) { showToast('Lỗi cập nhật', false); return; }
+  showToast(status==='confirmed'?'✅ Đã xác nhận lịch':status==='done'?'🏁 Hoàn thành':'❌ Đã huỷ');
+  loadInspections(); loadDashboard();
+}
+async function delInspection(id) {
+  if (!confirm('Xoá lịch hẹn này?')) return;
+  const { error } = await db.from('inspections').delete().eq('id',id);
+  if (error) { showToast('Lỗi xoá', false); return; }
+  showToast('🗑️ Đã xoá lịch hẹn');
+  loadInspections();
+}
+
+/* ── USERS ── */
+async function loadUsers() {
+  document.getElementById('users-body').innerHTML =
+    `<tr><td colspan="7" class="loading-cell"><i class="fas fa-spinner fa-spin"></i> Đang tải...</td></tr>`;
+  const { data, error } = await db.from('users').select('id,name,email,phone,role,created_at').order('created_at',{ascending:false});
+  if (error) { showToast('Lỗi tải dữ liệu', false); return; }
+  document.getElementById('users-count').textContent = `${data.length} người dùng`;
+  document.getElementById('users-info').textContent  = `Tổng ${data.length} tài khoản`;
+  const tbody = document.getElementById('users-body');
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-cell"><i class="fas fa-users"></i><p>Chưa có người dùng nào</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.map(r => `<tr>
+    <td style="font-weight:600">${r.name||'–'}</td>
+    <td style="font-size:12.5px;color:var(--text-muted)">${r.email||'–'}</td>
+    <td style="font-size:12.5px">${r.phone||'–'}</td>
+    <td>${badge(r.role==='seller'?'seller':'buyer')}</td>
+    <td>${badge(r.role==='admin'?'admin':'user')}</td>
+    <td style="font-size:12px">${fmtDate(r.created_at)}</td>
+    <td>
+      ${r.role!=='admin'
+        ? `<button class="btn-a ba-del" onclick="delUser('${r.id}')"><i class="fas fa-trash"></i></button>`
+        : '<span style="font-size:11px;color:var(--text-muted)">–</span>'}
+    </td>
+  </tr>`).join('');
+}
+async function delUser(id) {
+  if (!confirm('Xoá người dùng này?')) return;
+  const { error } = await db.from('users').delete().eq('id',id);
+  if (error) { showToast('Lỗi xoá', false); return; }
+  showToast('🗑️ Đã xoá người dùng');
+  loadUsers();
+}
+
+/* ── SEARCH ── */
+let st = null;
+function handleSearch() {
+  clearTimeout(st);
+  st = setTimeout(() => {
+    const active = document.querySelector('.tab-panel.active')?.id;
+    if (active === 'tab-listings')    loadListings();
+    if (active === 'tab-inspections') loadInspections();
+  }, 400);
+}
+
+/* ── INIT ── */
+loadDashboard();
+</script>
+</body>
+</html>

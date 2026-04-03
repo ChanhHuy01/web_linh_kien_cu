@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Công ty Điện tử tin học - ITC</title>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* ══════════════════════════════════════
+       MODAL ĐĂNG BÁN – styles riêng
+    ══════════════════════════════════════ */
+    .sell-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 9999;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 30px 16px 30px;
+      overflow-y: auto;
+    }
+    .sell-overlay.open { display: flex; }
+
+    .sell-modal {
+      background: #fff;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 780px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+      animation: slideDown .3s cubic-bezier(.34,1.4,.64,1);
+      position: relative;
+      overflow: hidden;
+    }
+    @keyframes slideDown {
+      from { opacity:0; transform:translateY(-40px) scale(.97); }
+      to   { opacity:1; transform:translateY(0)     scale(1);   }
+    }
+
+    .sell-modal-header {
+      background: linear-gradient(120deg, #16a34a 0%, #22c55e 100%);
+      padding: 22px 30px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .sell-modal-header h2 {
+      color: #fff; font-size: 18px; font-weight: 800; margin: 0;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .sell-modal-header p {
+      color: rgba(255,255,255,.82); font-size: 12.5px; margin: 3px 0 0;
+    }
+    .sell-close-btn {
+      background: rgba(255,255,255,.2); border: none; color: #fff;
+      width: 34px; height: 34px; border-radius: 50%; font-size: 16px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background .2s; flex-shrink: 0;
+    }
+    .sell-close-btn:hover { background: rgba(255,255,255,.35); }
+
+    .sell-steps-bar {
+      display: flex; background: #f0fdf4; border-bottom: 1.5px solid #dcfce7;
+      padding: 0 30px;
+    }
+    .sell-step-tab {
+      padding: 12px 0; margin-right: 28px; font-size: 13px; font-weight: 600;
+      color: #9ca3af; border-bottom: 2.5px solid transparent; cursor: default;
+      display: flex; align-items: center; gap: 6px; transition: color .2s;
+    }
+    .sell-step-tab.active { color: #16a34a; border-color: #22c55e; }
+    .sell-step-tab .sn {
+      width: 20px; height: 20px; border-radius: 50%; background: #d1d5db;
+      color: #fff; font-size: 11px; display: flex; align-items: center; justify-content: center;
+    }
+    .sell-step-tab.active .sn { background: #22c55e; }
+
+    .sell-modal-body { padding: 28px 30px 24px; }
+
+    .sell-section { margin-bottom: 24px; }
+    .sell-section-title {
+      font-size: 13.5px; font-weight: 700; color: #111827;
+      margin-bottom: 14px; display: flex; align-items: center; gap: 7px;
+    }
+    .sell-section-title .ico {
+      width: 28px; height: 28px; border-radius: 7px; background: #dcfce7;
+      display: flex; align-items: center; justify-content: center; font-size: 14px;
+    }
+
+    .sell-upload-zone {
+      border: 2px dashed #22c55e; border-radius: 12px; background: #f0fdf4;
+      padding: 22px; text-align: center; cursor: pointer; transition: background .2s;
+    }
+    .sell-upload-zone:hover { background: #dcfce7; }
+    .sell-upload-zone input { display: none; }
+    .sell-upload-zone .uico { font-size: 32px; margin-bottom: 6px; }
+    .sell-upload-zone .ulabel { font-size: 14px; font-weight: 600; color: #16a34a; }
+    .sell-upload-zone .usub { font-size: 11.5px; color: #6b7280; margin-top: 3px; }
+
+    .sell-img-grid {
+      display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 12px;
+    }
+    .sell-img-slot {
+      aspect-ratio: 1; border-radius: 8px; border: 1.5px dashed #e5e7eb;
+      background: #f9fafb; display: flex; align-items: center; justify-content: center;
+      font-size: 18px; color: #d1d5db; overflow: hidden; position: relative; cursor: pointer;
+    }
+    .sell-img-slot img { width:100%; height:100%; object-fit:cover; border-radius:7px; }
+    .sell-img-slot .sdel {
+      display: none; position: absolute; top: 3px; right: 3px;
+      background: rgba(239,68,68,.85); color: #fff; border: none;
+      width: 18px; height: 18px; border-radius: 50%; font-size: 10px;
+      cursor: pointer; align-items: center; justify-content: center;
+    }
+    .sell-img-slot:hover .sdel { display: flex; }
+
+    .sell-row { margin-bottom: 15px; }
+    .sell-row label { display:block; font-size:12.5px; font-weight:600; margin-bottom:5px; color:#374151; }
+    .sell-row label .req { color:#ef4444; margin-left:2px; }
+    .sell-row input, .sell-row textarea, .sell-row select {
+      width:100%; padding:10px 13px; border:1.5px solid #e5e7eb; border-radius:9px;
+      font-family:inherit; font-size:13.5px; color:#111827; background:#fff;
+      outline:none; transition:border-color .2s, box-shadow .2s; appearance:none;
+    }
+    .sell-row input:focus, .sell-row textarea:focus, .sell-row select:focus {
+      border-color:#22c55e; box-shadow:0 0 0 3px rgba(34,197,94,.12);
+    }
+    .sell-row textarea { resize:vertical; min-height:90px; }
+    .sell-row .hint { font-size:11px; color:#9ca3af; margin-top:4px; }
+    .sell-two { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+
+    .sell-chips { display:flex; flex-wrap:wrap; gap:7px; margin-top:5px; }
+    .sell-chip {
+      padding:6px 14px; border-radius:100px; border:1.5px solid #e5e7eb;
+      font-size:12.5px; font-weight:500; cursor:pointer; background:#fff;
+      transition:all .18s; user-select:none;
+    }
+    .sell-chip:hover { border-color:#22c55e; color:#16a34a; }
+    .sell-chip.sel { background:#22c55e; border-color:#22c55e; color:#fff; }
+
+    .sell-cond-group { display:flex; gap:8px; margin-top:5px; flex-wrap:wrap; }
+    .sell-cond-btn {
+      flex:1; min-width:110px; padding:9px 8px; border-radius:9px; border:1.5px solid #e5e7eb;
+      background:#fff; font-family:inherit; font-size:12.5px; font-weight:600; cursor:pointer;
+      text-align:center; transition:all .18s;
+    }
+    .sell-cond-btn:hover { border-color:#22c55e; }
+    .sell-cond-btn.sel { background:#dcfce7; border-color:#22c55e; color:#16a34a; }
+
+    .sell-price-wrap { position:relative; }
+    .sell-price-wrap input { padding-right:36px; }
+    .sell-price-suffix {
+      position:absolute; right:13px; top:50%; transform:translateY(-50%);
+      font-size:12.5px; font-weight:700; color:#9ca3af;
+    }
+
+    .sell-divider { border:none; border-top:1.5px solid #f3f4f6; margin:20px 0; }
+
+    .sell-err { font-size:11.5px; color:#ef4444; margin-top:4px; display:none; }
+    .sell-row.has-err input,
+    .sell-row.has-err textarea,
+    .sell-row.has-err select { border-color:#ef4444; }
+    .sell-row.has-err .sell-err { display:block; }
+
+    .sell-modal-footer {
+      padding: 16px 30px 22px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-top: 1.5px solid #f3f4f6; background: #fafafa;
+    }
+    .sell-footer-info { font-size:12px; color:#6b7280; }
+    .sell-footer-info strong { color:#16a34a; }
+    .sell-submit-btn {
+      background:#22c55e; color:#fff; border:none; border-radius:10px;
+      padding:11px 28px; font-family:inherit; font-size:14px; font-weight:700;
+      cursor:pointer; display:flex; align-items:center; gap:7px;
+      transition:background .2s, transform .15s;
+    }
+    .sell-submit-btn:hover { background:#16a34a; transform:translateY(-1px); }
+    .sell-submit-btn:active { transform:translateY(0); }
+
+    .sell-success { display:none; text-align:center; padding:50px 30px; }
+    .sell-success.show { display:block; }
+    .sell-success .sico { font-size:56px; margin-bottom:14px; }
+    .sell-success h3 { font-size:20px; font-weight:800; margin-bottom:8px; }
+    .sell-success p { font-size:13.5px; color:#6b7280; margin-bottom:22px; }
+    .sell-success .s-actions { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+    .sell-btn-ghost {
+      border:1.5px solid #22c55e; background:transparent; color:#16a34a;
+      border-radius:9px; padding:10px 22px; font-family:inherit; font-size:13.5px;
+      font-weight:700; cursor:pointer; transition:background .2s;
+    }
+    .sell-btn-ghost:hover { background:#f0fdf4; }
+
+    @media(max-width:600px){
+      .sell-modal-body { padding:20px 16px 16px; }
+      .sell-modal-header { padding:18px 16px; }
+      .sell-steps-bar { padding:0 16px; }
+      .sell-modal-footer { padding:14px 16px 18px; flex-direction:column; gap:12px; }
+      .sell-two { grid-template-columns:1fr; }
+      .sell-img-grid { grid-template-columns:repeat(4,1fr); }
+    }
+
+    /* ══════════════════════════════════════
+       MODAL KIỂM TRA LINH KIỆN
+    ══════════════════════════════════════ */
+    .check-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.58);
+      z-index: 9999;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 30px 16px;
+      overflow-y: auto;
+    }
+    .check-overlay.open { display: flex; }
+
+    .check-modal {
+      background: #fff;
+      border-radius: 22px;
+      width: 100%;
+      max-width: 700px;
+      box-shadow: 0 28px 70px rgba(0,0,0,0.28);
+      animation: checkSlideIn .32s cubic-bezier(.34,1.4,.64,1);
+      overflow: hidden;
+      position: relative;
+    }
+    @keyframes checkSlideIn {
+      from { opacity:0; transform:translateY(-36px) scale(.96); }
+      to   { opacity:1; transform:translateY(0) scale(1); }
+    }
+
+    .check-header {
+      background: linear-gradient(120deg, #ea580c 0%, #f97316 60%, #fb923c 100%);
+      padding: 24px 30px 22px;
+      display: flex; align-items: flex-start; justify-content: space-between;
+    }
+    .check-header-text h2 {
+      color: #fff; font-size: 19px; font-weight: 800; margin: 0;
+      display: flex; align-items: center; gap: 9px;
+    }
+    .check-header-text p {
+      color: rgba(255,255,255,.82); font-size: 12.5px; margin: 4px 0 0;
+    }
+    .check-header-badges {
+      display: flex; gap: 7px; margin-top: 10px; flex-wrap: wrap;
+    }
+    .check-badge {
+      background: rgba(255,255,255,.18); color: #fff;
+      border: 1px solid rgba(255,255,255,.3);
+      border-radius: 100px; padding: 3px 10px; font-size: 11px; font-weight: 600;
+    }
+    .check-close-btn {
+      background: rgba(255,255,255,.2); border: none; color: #fff;
+      width: 34px; height: 34px; border-radius: 50%; font-size: 15px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background .2s; flex-shrink: 0;
+    }
+    .check-close-btn:hover { background: rgba(255,255,255,.38); }
+
+    .check-services {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      background: #fff7ed; border-bottom: 1.5px solid #fed7aa;
+      padding: 14px 24px; gap: 4px;
+    }
+    .check-srv {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 12px; font-weight: 600; color: #c2410c;
+    }
+    .check-srv .srv-ico {
+      width: 28px; height: 28px; background: #ffedd5; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .check-body { padding: 26px 30px 10px; }
+
+    .chk-row { margin-bottom: 16px; }
+    .chk-row label {
+      display: block; font-size: 12.5px; font-weight: 700;
+      margin-bottom: 5px; color: #374151;
+    }
+    .chk-row label .req { color: #ef4444; margin-left: 2px; }
+    .chk-row input, .chk-row select, .chk-row textarea {
+      width: 100%; padding: 10px 13px; border: 1.5px solid #e5e7eb;
+      border-radius: 9px; font-family: inherit; font-size: 13.5px;
+      color: #111827; background: #fff; outline: none;
+      transition: border-color .2s, box-shadow .2s; appearance: none; box-sizing: border-box;
+    }
+    .chk-row input:focus, .chk-row select:focus, .chk-row textarea:focus {
+      border-color: #f97316; box-shadow: 0 0 0 3px rgba(249,115,22,.12);
+    }
+    .chk-row textarea { resize: vertical; min-height: 80px; }
+    .chk-row .hint { font-size: 11px; color: #9ca3af; margin-top: 4px; }
+    .chk-two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    .chk-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 5px; }
+    .chk-chip {
+      padding: 6px 13px; border-radius: 100px; border: 1.5px solid #e5e7eb;
+      font-size: 12.5px; font-weight: 500; cursor: pointer; background: #fff;
+      transition: all .18s; user-select: none;
+    }
+    .chk-chip:hover { border-color: #f97316; color: #ea580c; }
+    .chk-chip.sel { background: #f97316; border-color: #f97316; color: #fff; }
+
+    .chk-service-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px;
+    }
+    .chk-svc-item {
+      display: flex; align-items: center; gap: 9px;
+      padding: 10px 13px; border: 1.5px solid #e5e7eb;
+      border-radius: 9px; cursor: pointer; transition: all .18s;
+      background: #fff;
+    }
+    .chk-svc-item:hover { border-color: #f97316; background: #fff7ed; }
+    .chk-svc-item.sel { border-color: #f97316; background: #fff7ed; }
+    .chk-svc-item input[type=checkbox] { display: none; }
+    .chk-svc-ico { font-size: 18px; flex-shrink: 0; }
+    .chk-svc-info { flex: 1; }
+    .chk-svc-info strong { display: block; font-size: 12.5px; font-weight: 700; color: #111827; }
+    .chk-svc-info span { font-size: 11px; color: #6b7280; }
+    .chk-svc-check {
+      width: 18px; height: 18px; border: 2px solid #d1d5db;
+      border-radius: 5px; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: all .15s; font-size: 10px; color: transparent;
+    }
+    .chk-svc-item.sel .chk-svc-check {
+      background: #f97316; border-color: #f97316; color: #fff;
+    }
+
+    .chk-slots { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 6px; }
+    .chk-slot {
+      padding: 7px 14px; border-radius: 8px; border: 1.5px solid #e5e7eb;
+      font-size: 12.5px; font-weight: 600; cursor: pointer;
+      background: #fff; transition: all .18s; color: #374151;
+    }
+    .chk-slot:hover { border-color: #f97316; color: #ea580c; }
+    .chk-slot.sel { background: #f97316; border-color: #f97316; color: #fff; }
+    .chk-slot.disabled { opacity: .4; cursor: not-allowed; pointer-events: none; }
+
+    .chk-err { font-size: 11.5px; color: #ef4444; margin-top: 4px; display: none; }
+    .chk-row.has-err input,
+    .chk-row.has-err select { border-color: #ef4444; }
+    .chk-row.has-err .chk-err { display: block; }
+
+    .chk-summary {
+      background: #fff7ed; border: 1.5px solid #fed7aa; border-radius: 12px;
+      padding: 14px 16px; margin: 16px 0 0; display: none;
+    }
+    .chk-summary.show { display: block; }
+    .chk-summary-title { font-size: 12px; font-weight: 700; color: #c2410c; margin-bottom: 8px; }
+    .chk-summary-row {
+      display: flex; justify-content: space-between;
+      font-size: 12.5px; color: #374151; padding: 3px 0;
+    }
+    .chk-summary-total {
+      display: flex; justify-content: space-between;
+      font-size: 14px; font-weight: 800; color: #ea580c;
+      border-top: 1px solid #fed7aa; margin-top: 7px; padding-top: 7px;
+    }
+
+    .check-footer {
+      padding: 16px 30px 22px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-top: 1.5px solid #f3f4f6; background: #fafafa;
+    }
+    .check-footer-info { font-size: 11.5px; color: #6b7280; line-height: 1.5; }
+    .check-footer-info strong { color: #ea580c; }
+    .check-submit-btn {
+      background: #f97316; color: #fff; border: none; border-radius: 10px;
+      padding: 12px 28px; font-family: inherit; font-size: 14px; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; gap: 7px;
+      transition: background .2s, transform .15s; white-space: nowrap;
+    }
+    .check-submit-btn:hover { background: #ea580c; transform: translateY(-1px); }
+    .check-submit-btn:active { transform: translateY(0); }
+    .check-btn-ghost {
+      border: 1.5px solid #e5e7eb; background: transparent; color: #6b7280;
+      border-radius: 9px; padding: 10px 18px; font-family: inherit; font-size: 13px;
+      font-weight: 600; cursor: pointer; transition: all .2s;
+    }
+    .check-btn-ghost:hover { border-color: #f97316; color: #ea580c; }
+
+    .check-success { display: none; text-align: center; padding: 50px 30px; }
+    .check-success.show { display: block; }
+    .check-success .cs-ico { font-size: 60px; margin-bottom: 14px; }
+    .check-success h3 { font-size: 21px; font-weight: 800; margin-bottom: 8px; color: #111827; }
+    .check-success p { font-size: 13.5px; color: #6b7280; line-height: 1.7; margin-bottom: 6px; }
+    .check-success .cs-ref {
+      display: inline-block; background: #fff7ed; border: 1.5px solid #fed7aa;
+      border-radius: 9px; padding: 8px 20px; font-size: 13px; font-weight: 700;
+      color: #ea580c; margin: 10px 0 20px;
+    }
+    .check-success .cs-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+    @media(max-width:600px){
+      .check-body { padding: 18px 16px 10px; }
+      .check-header { padding: 18px 16px; }
+      .check-services { grid-template-columns: 1fr; padding: 12px 16px; }
+      .check-footer { padding: 14px 16px 18px; flex-direction: column; gap: 10px; }
+      .chk-two { grid-template-columns: 1fr; }
+      .chk-service-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOADING BAR -->
+<div class="loading-bar" id="loadingBar"></div>
+
+<!-- TOAST NOTIFICATION -->
+<div class="toast" id="toast">
+  <i class="fas fa-check-circle toast-icon"></i>
+  <span class="toast-text" id="toastText">Đã thêm vào giỏ hàng!</span>
+</div>
+
+<!-- ========================
+     MODAL - PRODUCT DETAIL
+======================== -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="productModal" style="position:relative;">
+    <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+    <div class="modal-grid">
+      <div class="modal-img" id="modalImg">💻</div>
+      <div class="modal-content">
+        <div class="product-category" id="modalCat">CPU</div>
+        <h2 id="modalName">Tên sản phẩm</h2>
+        <div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.3rem;">
+          <span style="color:var(--warning); font-size:0.85rem;">★★★★☆</span>
+          <span style="font-size:0.78rem; color:var(--text-muted);">(24 đánh giá)</span>
+        </div>
+        <div class="modal-price" id="modalPrice">0₫</div>
+        <div class="modal-specs" id="modalSpecs"></div>
+        <p style="font-size:0.85rem; color:var(--text-muted); line-height:1.7;" id="modalDesc"></p>
+        <div class="modal-actions">
+          <button class="btn-buy" onclick="buyNow()"><i class="fas fa-bolt"></i> Mua ngay</button>
+          <button class="btn-cart-lg" onclick="addToCartModal()"><i class="fas fa-shopping-cart"></i> Thêm giỏ</button>
+        </div>
+        <div style="display:flex; gap:1.5rem; margin-top:1rem; font-size:0.78rem; color:var(--text-muted);">
+          <span><i class="fas fa-shield-alt" style="color:var(--success); margin-right:0.3rem;"></i>Kiểm tra kỹ</span>
+          <span><i class="fas fa-undo"       style="color:var(--accent);  margin-right:0.3rem;"></i>Đổi trong 7 ngày</span>
+          <span><i class="fas fa-truck"      style="color:var(--accent2); margin-right:0.3rem;"></i>Giao toàn quốc</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     MODAL ĐĂNG BÁN MIỄN PHÍ
+════════════════════════════════════════ -->
+<div class="sell-overlay" id="sellOverlay" onclick="closeSellModal(event)">
+  <div class="sell-modal" id="sellModal">
+
+    <div class="sell-modal-header">
+      <div>
+        <h2><i class="fas fa-store"></i> Đăng Bán Miễn Phí</h2>
+        <p>Miễn phí 100% · Hiển thị sau ~15 phút kiểm duyệt</p>
+      </div>
+      <button class="sell-close-btn" id="sellCloseBtn"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="sell-steps-bar">
+      <div class="sell-step-tab active" id="stab1" onclick="sellGoStep1()" style="cursor:pointer;"><div class="sn">1</div> Sản phẩm</div>
+      <div class="sell-step-tab" id="stab2" onclick="sellGoStep2()" style="cursor:pointer;"><div class="sn">2</div> Giá &amp; Bảo hành</div>
+    </div>
+
+    <div class="sell-modal-body" id="sellStep1">
+      <div class="sell-section">
+        <div class="sell-section-title"><div class="ico">📷</div> Ảnh sản phẩm</div>
+        <div class="sell-upload-zone" id="sellDropZone" onclick="document.getElementById('sellFileInput').click()">
+          <input type="file" id="sellFileInput" multiple accept="image/*" onchange="sellHandleFiles(this.files)">
+          <div class="uico">🖼️</div>
+          <div class="ulabel">Nhấn để chọn ảnh hoặc kéo thả vào đây</div>
+          <div class="usub">Tối đa 10 ảnh · JPG, PNG · Mỗi ảnh dưới 5MB</div>
+        </div>
+        <div class="sell-img-grid" id="sellImgGrid"></div>
+      </div>
+
+      <hr class="sell-divider">
+
+      <div class="sell-section">
+        <div class="sell-section-title"><div class="ico">📋</div> Thông tin sản phẩm</div>
+
+        <div class="sell-row" id="srow-cat">
+          <label>Danh mục <span class="req">*</span></label>
+          <div class="sell-chips">
+            <div class="sell-chip" onclick="sellChip(this,'scat')">🔲 CPU</div>
+            <div class="sell-chip" onclick="sellChip(this,'scat')">🧩 RAM</div>
+            <div class="sell-chip" onclick="sellChip(this,'scat')">🖥️ GPU</div>
+            <div class="sell-chip" onclick="sellChip(this,'scat')">🔌 Mainboard</div>
+            <div class="sell-chip" onclick="sellChip(this,'scat')">💾 SSD/HDD</div>
+            <div class="sell-chip" onclick="sellChip(this,'scat')">⚡ Nguồn</div>
+            <div class="sell-chip" onclick="sellChip(this,'scat')">🗃️ Case</div>
+            <div class="sell-chip" onclick="sellChip(this,'scat')">📦 Khác</div>
+          </div>
+          <input type="hidden" id="scat">
+          <div class="sell-err" id="serr-cat">Vui lòng chọn danh mục.</div>
+        </div>
+
+        <div class="sell-row" id="srow-title">
+          <label>Tên sản phẩm <span class="req">*</span></label>
+          <input type="text" id="stitle" placeholder="VD: Intel Core i7-12700K Box Full" maxlength="120">
+          <div class="hint">Đặt tên rõ: thương hiệu + dòng sản phẩm + đặc điểm</div>
+          <div class="sell-err" id="serr-title">Tên sản phẩm không được để trống.</div>
+        </div>
+
+        <div class="sell-row" id="srow-desc">
+          <label>Mô tả chi tiết <span class="req">*</span></label>
+          <textarea id="sdesc" placeholder="Tình trạng, thông số kỹ thuật, phụ kiện đi kèm, lý do bán..."></textarea>
+          <div class="sell-err" id="serr-desc">Vui lòng nhập mô tả sản phẩm.</div>
+        </div>
+
+        <div class="sell-row" id="srow-cond">
+          <label>Tình trạng <span class="req">*</span></label>
+          <div class="sell-cond-group">
+            <button class="sell-cond-btn" onclick="sellCond(this,'like-new')">🌟 Like New 95%+</button>
+            <button class="sell-cond-btn" onclick="sellCond(this,'good')">👍 Tốt 80–94%</button>
+            <button class="sell-cond-btn" onclick="sellCond(this,'fair')">🔄 Bình thường 60–79%</button>
+            <button class="sell-cond-btn" onclick="sellCond(this,'parts')">🔩 Lấy linh kiện</button>
+          </div>
+          <input type="hidden" id="scond">
+          <div class="sell-err" id="serr-cond">Vui lòng chọn tình trạng sản phẩm.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sell-modal-body" id="sellStep2" style="display:none;">
+      <div class="sell-section">
+        <div class="sell-section-title"><div class="ico">💰</div> Giá bán &amp; Bảo hành</div>
+        <div class="sell-two">
+          <div class="sell-row" id="srow-price">
+            <label>Giá bán <span class="req">*</span></label>
+            <div class="sell-price-wrap">
+              <input type="number" id="sprice" placeholder="VD: 3500000" min="0">
+              <span class="sell-price-suffix">₫</span>
+            </div>
+            <div class="hint">Nhập giá bạn muốn bán (đồng)</div>
+            <div class="sell-err" id="serr-price">Vui lòng nhập giá bán hợp lệ.</div>
+          </div>
+          <div class="sell-row">
+            <label>Bảo hành còn lại</label>
+            <select id="swarranty">
+              <option value="">Không có</option>
+              <option>1 tháng</option>
+              <option>3 tháng</option>
+              <option>6 tháng</option>
+              <option>12 tháng</option>
+              <option>24 tháng+</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="sell-row">
+          <label>Hình thức giao dịch</label>
+          <div class="sell-chips">
+            <div class="sell-chip sel" onclick="sellChip(this,'strade')">🤝 Gặp trực tiếp</div>
+            <div class="sell-chip" onclick="sellChip(this,'strade')">📦 Ship toàn quốc</div>
+            <div class="sell-chip" onclick="sellChip(this,'strade')">✅ Cả hai</div>
+          </div>
+          <input type="hidden" id="strade" value="meet">
+        </div>
+
+        <div class="sell-row">
+          <label>Địa điểm giao dịch</label>
+          <select id="sloc">
+            <option value="">-- Chọn tỉnh thành --</option>
+            <option>Hà Nội</option><option>TP. Hồ Chí Minh</option>
+            <option>Đà Nẵng</option><option>Cần Thơ</option>
+            <option>Hải Phòng</option><option>Bình Dương</option>
+            <option>Đồng Nai</option><option>Quảng Nam</option>
+            <option>Thừa Thiên Huế</option><option>Khánh Hòa</option>
+            <option>Lâm Đồng</option><option>Khác</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="sell-success" id="sellSuccess">
+      <div class="sico">🎉</div>
+      <h3>Đăng tin thành công!</h3>
+      <p>Tin của bạn đang được kiểm duyệt và sẽ hiển thị trong khoảng <strong>15 phút</strong>.</p>
+      <div class="s-actions">
+        <button class="sell-submit-btn" onclick="sellReset()"><i class="fas fa-plus"></i> Đăng thêm</button>
+        <button class="sell-btn-ghost" onclick="closeSellModal()">Đóng</button>
+      </div>
+    </div>
+
+    <div class="sell-modal-footer" id="sellFooter">
+      <div id="sfooter1" style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+        <div class="sell-footer-info">Bước 1 / 2 · Điền thông tin sản phẩm</div>
+        <button class="sell-submit-btn" onclick="sellGoStep2()">
+          Tiếp theo <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+      <div id="sfooter2" style="display:none; align-items:center; justify-content:space-between; width:100%;">
+        <button class="sell-btn-ghost" onclick="sellGoStep1()">
+          <i class="fas fa-arrow-left"></i> Quay lại
+        </button>
+        <button class="sell-submit-btn" onclick="sellSubmit()">
+          <i class="fas fa-paper-plane"></i> Đăng tin miễn phí
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     MODAL ĐẶT LỊCH KIỂM TRA LINH KIỆN
+════════════════════════════════════════ -->
+<div class="check-overlay" id="checkOverlay" onclick="closeCheckModal(event)">
+  <div class="check-modal" id="checkModal">
+
+    <div class="check-header">
+      <div class="check-header-text">
+        <h2>🔧 Đặt Lịch Kiểm Tra Linh Kiện</h2>
+        <p>Đội ngũ kỹ thuật viên chuyên nghiệp – Kết quả chính xác trong 30–60 phút</p>
+        <div class="check-header-badges">
+          <span class="check-badge">✅ Miễn phí tư vấn</span>
+          <span class="check-badge">🕐 Kết quả trong 60'</span>
+          <span class="check-badge">📋 Báo cáo chi tiết</span>
+        </div>
+      </div>
+      <button class="check-close-btn" id="checkCloseBtn"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="check-services">
+      <div class="check-srv"><div class="srv-ico">🖥️</div><span>Kiểm tra CPU/GPU</span></div>
+      <div class="check-srv"><div class="srv-ico">🧩</div><span>Test RAM/SSD</span></div>
+      <div class="check-srv"><div class="srv-ico">📊</div><span>Báo cáo benchmark</span></div>
+    </div>
+
+    <div class="check-body" id="checkFormBody">
+
+      <div class="chk-two">
+        <div class="chk-row" id="crow-name">
+          <label>Họ và tên <span class="req">*</span></label>
+          <input type="text" id="chk-name" placeholder="Nguyễn Văn A">
+          <div class="chk-err" id="cerr-name">Vui lòng nhập họ tên.</div>
+        </div>
+        <div class="chk-row" id="crow-phone">
+          <label>Số điện thoại <span class="req">*</span></label>
+          <input type="tel" id="chk-phone" placeholder="0912 345 678">
+          <div class="chk-err" id="cerr-phone">Số điện thoại không hợp lệ.</div>
+        </div>
+      </div>
+
+      <div class="chk-row" id="crow-device">
+        <label>Loại linh kiện cần kiểm tra <span class="req">*</span></label>
+        <div class="chk-chips">
+          <div class="chk-chip" onclick="chkChip(this,'chk-device')">🔲 CPU</div>
+          <div class="chk-chip" onclick="chkChip(this,'chk-device')">🧩 RAM</div>
+          <div class="chk-chip" onclick="chkChip(this,'chk-device')">🖥️ GPU</div>
+          <div class="chk-chip" onclick="chkChip(this,'chk-device')">🔌 Mainboard</div>
+          <div class="chk-chip" onclick="chkChip(this,'chk-device')">💾 SSD/HDD</div>
+          <div class="chk-chip" onclick="chkChip(this,'chk-device')">⚡ Nguồn</div>
+          <div class="chk-chip" onclick="chkChip(this,'chk-device')">📦 Bộ máy đầy đủ</div>
+        </div>
+        <input type="hidden" id="chk-device">
+        <div class="chk-err" id="cerr-device">Vui lòng chọn loại linh kiện.</div>
+      </div>
+
+      <div class="chk-row">
+        <label>Dịch vụ cần thực hiện</label>
+        <div class="chk-service-grid">
+          <label class="chk-svc-item" onclick="chkToggleSvc(this)">
+            <input type="checkbox" value="benchmark">
+            <div class="chk-svc-ico">📊</div>
+            <div class="chk-svc-info">
+              <strong>Benchmark toàn diện</strong>
+              <span>Đo hiệu năng CPU/GPU/RAM</span>
+            </div>
+            <div class="chk-svc-check">✓</div>
+          </label>
+          <label class="chk-svc-item" onclick="chkToggleSvc(this)">
+            <input type="checkbox" value="stress">
+            <div class="chk-svc-ico">🔥</div>
+            <div class="chk-svc-info">
+              <strong>Stress test</strong>
+              <span>Kiểm tra độ bền, nhiệt độ</span>
+            </div>
+            <div class="chk-svc-check">✓</div>
+          </label>
+          <label class="chk-svc-item" onclick="chkToggleSvc(this)">
+            <input type="checkbox" value="diagnostic">
+            <div class="chk-svc-ico">🔍</div>
+            <div class="chk-svc-info">
+              <strong>Chẩn đoán lỗi</strong>
+              <span>Phát hiện lỗi tiềm ẩn</span>
+            </div>
+            <div class="chk-svc-check">✓</div>
+          </label>
+          <label class="chk-svc-item" onclick="chkToggleSvc(this)">
+            <input type="checkbox" value="report">
+            <div class="chk-svc-ico">📋</div>
+            <div class="chk-svc-info">
+              <strong>Báo cáo chi tiết</strong>
+              <span>PDF báo cáo gửi qua Zalo</span>
+            </div>
+            <div class="chk-svc-check">✓</div>
+          </label>
+        </div>
+      </div>
+
+      <div class="chk-two">
+        <div class="chk-row" id="crow-date">
+          <label>Ngày hẹn <span class="req">*</span></label>
+          <input type="date" id="chk-date">
+          <div class="chk-err" id="cerr-date">Vui lòng chọn ngày hẹn.</div>
+        </div>
+        <div class="chk-row">
+          <label>Khung giờ</label>
+          <div class="chk-slots" id="chkSlots">
+            <div class="chk-slot" onclick="chkSlot(this)">8:00 – 9:00</div>
+            <div class="chk-slot" onclick="chkSlot(this)">9:00 – 10:00</div>
+            <div class="chk-slot disabled">10:00 – 11:00</div>
+            <div class="chk-slot" onclick="chkSlot(this)">13:00 – 14:00</div>
+            <div class="chk-slot" onclick="chkSlot(this)">14:00 – 15:00</div>
+            <div class="chk-slot" onclick="chkSlot(this)">15:00 – 16:00</div>
+            <div class="chk-slot disabled">16:00 – 17:00</div>
+          </div>
+          <input type="hidden" id="chk-slot">
+          <div class="hint" style="margin-top:5px;">Màu xám = đã đặt đủ lịch</div>
+        </div>
+      </div>
+
+      <div class="chk-row">
+        <label>Ghi chú thêm</label>
+        <textarea id="chk-note" placeholder="Mô tả triệu chứng, tình trạng linh kiện hoặc yêu cầu đặc biệt..."></textarea>
+      </div>
+
+      <div class="chk-summary" id="chkSummary">
+        <div class="chk-summary-title">📋 Tóm tắt lịch hẹn</div>
+        <div class="chk-summary-row"><span>Linh kiện</span><span id="sum-device">–</span></div>
+        <div class="chk-summary-row"><span>Ngày giờ</span><span id="sum-datetime">–</span></div>
+        <div class="chk-summary-row"><span>Dịch vụ</span><span id="sum-services">Chưa chọn</span></div>
+        <div class="chk-summary-total"><span>Phí kiểm tra</span><span>Miễn phí ✅</span></div>
+      </div>
+
+    </div>
+
+    <div class="check-success" id="checkSuccess">
+      <div class="cs-ico">🎉</div>
+      <h3>Đặt lịch thành công!</h3>
+      <p>Cảm ơn bạn đã tin tưởng ITC. Chúng tôi sẽ xác nhận qua điện thoại trong <strong>30 phút</strong>.</p>
+      <div class="cs-ref" id="checkRefCode">Mã lịch hẹn: #ITC00000</div>
+      <p style="font-size:12px;">Mang linh kiện đến cơ sở ITC đúng giờ đã hẹn. Miễn phí gửi xe.</p>
+      <div class="cs-actions">
+        <button class="check-submit-btn" onclick="checkReset()"><i class="fas fa-calendar-plus"></i> Đặt lịch khác</button>
+        <button class="check-btn-ghost" onclick="closeCheckModal()">Đóng</button>
+      </div>
+    </div>
+
+    <div class="check-footer" id="checkFooter">
+      <div class="check-footer-info">
+        Hoàn toàn <strong>miễn phí</strong> · Kết quả trong <strong>30–60 phút</strong><br>
+        📍 Nhận lịch từ <strong>8:00 – 17:00</strong> (T2 – T7)
+      </div>
+      <button class="check-submit-btn" onclick="checkSubmit()">
+        <i class="fas fa-calendar-check"></i> Xác nhận đặt lịch
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ========================
+     HEADER
+======================== -->
+<header>
+  <div class="header-inner">
+    <a href="#" class="logo">ITC</a>
+
+    <div class="search-bar">
+      <input type="text" placeholder="Tìm kiếm CPU, RAM, GPU, Mainboard..." id="searchInput">
+      <button onclick="handleSearch()"><i class="fas fa-search"></i></button>
+    </div>
+
+    <nav>
+      <a href="#" class="active">Trang chủ</a>
+      <a href="shop.html">Mua hàng</a>
+      <a href="sell.html">Bán hàng</a>
+      <a href="lien-he.html">Liên hệ</a>
+      <a href="orders.html">Đơn hàng</a>
+    </nav>
+
+    <div class="header-actions">
+      <button class="cart-btn" onclick="showCart()">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-badge" id="cartBadge">0</span>
+      </button>
+      <div id="authButtons">
+        <a href="login.html" class="btn-outline">Đăng nhập</a>
+        <a href="login.html?tab=register" class="btn-primary">Đăng ký</a>
+      </div>
+      <div id="userMenu" style="display:none; align-items:center; gap:0.8rem;">
+        <div style="display:flex; align-items:center; gap:0.5rem; padding:0.4rem 0.9rem; background:rgba(0,212,255,0.08); border:1px solid var(--border); border-radius:8px;">
+          <div style="width:28px; height:28px; border-radius:50%; background:var(--accent3); display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:700; color:white;" id="userAvatar">U</div>
+          <span style="font-size:0.88rem; font-weight:600;" id="userName">User</span>
+        </div>
+        <button onclick="logout()" style="padding:0.45rem 1rem; border:1px solid rgba(239,68,68,0.5); border-radius:6px; background:none; color:#ef4444; font-family:inherit; font-size:0.85rem; font-weight:600; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.1)'" onmouseout="this.style.background='none'">
+          <i class="fas fa-sign-out-alt"></i> Đăng xuất
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ========================
+     HERO
+======================== -->
+<section class="hero">
+  <div class="hero-grid">
+    <div>
+      <div class="hero-badge"><i class="fas fa-bolt"></i> Nền tảng #1 linh kiện cũ tại Việt Nam</div>
+      <h1>Mua Bán <span class="highlight">Linh Kiện Cũ</span> Chất Lượng &amp; Uy Tín</h1>
+      <p>Hệ thống giao dịch linh kiện máy tính đã qua sử dụng với quy trình kiểm tra nghiêm ngặt. Tiết kiệm đến 70% so với hàng mới, đảm bảo hoạt động tốt.</p>
+      <div class="hero-ctas">
+        <button class="btn-hero-primary" onclick="scrollToProducts()"><i class="fas fa-search"></i> Khám phá ngay</button>
+        <button class="btn-hero-secondary" onclick="openSellModal()"><i class="fas fa-store"></i> Đăng bán miễn phí</button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item"><h3>12K+</h3><p>Sản phẩm</p></div>
+        <div class="stat-item"><h3>8.5K+</h3><p>Người bán</p></div>
+        <div class="stat-item"><h3>50K+</h3><p>Giao dịch</p></div>
+        <div class="stat-item"><h3>99%</h3><p>Hài lòng</p></div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="hero-card" onclick="filterCategory('CPU')">
+        <div class="hcard-icon blue"><i class="fas fa-microchip"></i></div>
+        <h4>CPU Đã Kiểm Tra</h4>
+        <p>Intel, AMD chính hãng, test benchmark đầy đủ</p>
+      </div>
+      <div class="hero-card" onclick="filterCategory('RAM')">
+        <div class="hcard-icon orange"><i class="fas fa-memory"></i></div>
+        <h4>RAM Chất Lượng</h4>
+        <p>DDR4, DDR5 từ các thương hiệu uy tín</p>
+      </div>
+      <div class="hero-card" onclick="filterCategory('GPU')">
+        <div class="hcard-icon purple"><i class="fas fa-tv"></i></div>
+        <h4>GPU Gaming</h4>
+        <p>RTX, RX series giá tốt, còn bảo hành</p>
+      </div>
+      <div class="hero-card" onclick="showWarranty()">
+        <div class="hcard-icon green"><i class="fas fa-shield-alt"></i></div>
+        <h4>Bảo Hành 3-6 Tháng</h4>
+        <p>Đổi trả trong 7 ngày nếu có vấn đề</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-inner">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Danh Mục <span>Sản Phẩm</span></div>
+        <div class="section-sub">Tìm kiếm theo loại linh kiện bạn cần</div>
+      </div>
+      <a href="#" class="view-all">Xem tất cả <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="categories-grid">
+      <a href="#" class="cat-card" onclick="filterCategory('CPU')">
+        <span class="cat-icon">🔲</span><h4>CPU</h4><p>1.240 sp</p>
+      </a>
+      <a href="#" class="cat-card" onclick="filterCategory('RAM')">
+        <span class="cat-icon">🧩</span><h4>RAM</h4><p>980 sp</p>
+      </a>
+      <a href="#" class="cat-card" onclick="filterCategory('GPU')">
+        <span class="cat-icon">🖥️</span><h4>Card màn hình</h4><p>756 sp</p>
+      </a>
+      <a href="#" class="cat-card" onclick="filterCategory('Mainboard')">
+        <span class="cat-icon">🔌</span><h4>Mainboard</h4><p>623 sp</p>
+      </a>
+      <a href="#" class="cat-card" onclick="filterCategory('SSD')">
+        <span class="cat-icon">💾</span><h4>SSD / HDD</h4><p>1.120 sp</p>
+      </a>
+      <a href="#" class="cat-card" onclick="filterCategory('Nguồn')">
+        <span class="cat-icon">⚡</span><h4>Nguồn</h4><p>445 sp</p>
+      </a>
+      <a href="#" class="cat-card" onclick="filterCategory('Case')">
+        <span class="cat-icon">🗃️</span><h4>Case / Vỏ máy</h4><p>378 sp</p>
+      </a>
+      <a href="#" class="cat-card" onclick="filterCategory('Tản nhiệt')">
+        <span class="cat-icon">❄️</span><h4>Tản nhiệt</h4><p>290 sp</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ========================
+     BANNER + FLASH SALE
+======================== -->
+<div class="banner-section">
+  <div class="banner-grid">
+    <div class="banner-main">
+      <div class="hero-badge" style="margin-bottom:1rem;"><i class="fas fa-fire"></i> Flash Sale hôm nay</div>
+      <h2>Giảm Đến <span>70%</span><br>Linh Kiện Hot</h2>
+      <p>Hàng nghìn linh kiện chất lượng cao, giá cực tốt. Kết thúc sau:</p>
+      <div class="countdown">
+        <div class="cd-item"><span class="cd-num" id="cdHour">00</span><span class="cd-label">Giờ</span></div>
+        <div class="cd-item" style="padding-top:0.5rem; font-size:1.5rem; color:var(--text-muted);">:</div>
+        <div class="cd-item"><span class="cd-num" id="cdMin">00</span><span class="cd-label">Phút</span></div>
+        <div class="cd-item" style="padding-top:0.5rem; font-size:1.5rem; color:var(--text-muted);">:</div>
+        <div class="cd-item"><span class="cd-num" id="cdSec">00</span><span class="cd-label">Giây</span></div>
+      </div>
+      <button class="btn-hero-primary" onclick="scrollToProducts()"><i class="fas fa-bolt"></i> Mua ngay</button>
+    </div>
+    <div class="banner-side">
+      <div class="banner-small purple">
+        <h3>🎯 Bán Linh Kiện Cũ</h3>
+        <p>Đăng bán miễn phí, tiếp cận hàng nghìn người mua</p>
+        <button class="btn-sm purple" onclick="openSellModal()">Đăng bán ngay</button>
+      </div>
+      <!-- ★ NÚT TÌM HIỂU THÊM ĐÃ GẮN openCheckModal() ★ -->
+      <div class="banner-small orange">
+        <h3>🔧 Dịch Vụ Kiểm Tra</h3>
+        <p>Kiểm tra linh kiện chuyên nghiệp trước khi giao dịch</p>
+        <button class="btn-sm orange" onclick="openCheckModal()">Tìm hiểu thêm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================
+     FILTER BAR
+======================== -->
+<div class="filter-section">
+  <div class="filter-inner">
+    <div class="filter-bar">
+      <span class="filter-label">Lọc:</span>
+      <span class="filter-chip active" onclick="setFilter(this, 'all')">Tất cả</span>
+      <span class="filter-chip" onclick="setFilter(this, 'hot')">🔥 Nổi bật</span>
+      <span class="filter-chip" onclick="setFilter(this, 'new')">✨ Mới đăng</span>
+      <span class="filter-chip" onclick="setFilter(this, 'sale')">🏷️ Giảm giá</span>
+      <span class="filter-chip" onclick="setFilter(this, 'verified')">✅ Đã kiểm tra</span>
+      <select class="filter-select" onchange="sortProducts(this.value)">
+        <option value="">Sắp xếp theo</option>
+        <option value="price-asc">Giá tăng dần</option>
+        <option value="price-desc">Giá giảm dần</option>
+        <option value="newest">Mới nhất</option>
+        <option value="popular">Phổ biến nhất</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- ========================
+     PRODUCTS GRID
+======================== -->
+<section class="section" id="productsSection">
+  <div class="section-inner">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Sản Phẩm <span>Nổi Bật</span></div>
+        <div class="section-sub" id="productCount">Hiển thị 8 / 1.240 sản phẩm</div>
+      </div>
+      <a href="#" class="view-all">Xem thêm <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="products-grid" id="productsGrid"></div>
+  </div>
+</section>
+
+<!-- ========================
+     HOW TO SELL
+======================== -->
+<section class="seller-section">
+  <div class="section-inner">
+    <div class="section-header" style="margin-bottom:2.5rem;">
+      <div>
+        <div class="section-title">Bán Hàng <span>Dễ Dàng</span></div>
+        <div class="section-sub">Quy trình đăng bán linh kiện cũ chỉ 4 bước đơn giản</div>
+      </div>
+    </div>
+    <div class="seller-steps">
+      <div class="step-card">
+        <div class="step-icon">📝</div>
+        <div class="step-num">01</div>
+        <h4>Đăng ký tài khoản</h4>
+        <p>Tạo tài khoản miễn phí và xác minh thông tin người bán trong vòng 5 phút.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-icon">📸</div>
+        <div class="step-num">02</div>
+        <h4>Chụp ảnh &amp; Mô tả</h4>
+        <p>Chụp ảnh rõ ràng, mô tả chi tiết tình trạng linh kiện và đặt giá mong muốn.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-icon">🔍</div>
+        <div class="step-num">03</div>
+        <h4>Kiểm duyệt &amp; Đăng</h4>
+        <p>Hệ thống kiểm duyệt trong 2–4 giờ. Sau đó sản phẩm hiển thị cho hàng nghìn người mua.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-icon">💰</div>
+        <div class="step-num">04</div>
+        <h4>Nhận tiền an toàn</h4>
+        <p>Thanh toán qua ví điện tử, ngân hàng. Tiền về tài khoản trong 24 giờ sau giao dịch.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================
+     FOOTER
+======================== -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a class="logo">I<span>TC</span></a>
+      <p>Nền tảng mua bán linh kiện máy tính cũ uy tín hàng đầu Việt Nam. Kết nối người bán và người mua trực tiếp, an toàn và tiết kiệm.</p>
+      <div class="social-links">
+        <a href="https://www.facebook.com/huychanh.112004" class="social-link"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://www.youtube.com/@huychanh6645" class="social-link"><i class="fab fa-youtube"></i></a>
+        <a href="https://www.tiktok.com/@chanhhuy0111" class="social-link"><i class="fab fa-tiktok"></i></a>
+        <a href="https://zalo.me/0357667793" class="social-btn" title="Zalo"><i class="fas fa-comment-dots"></i></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+/* ══════════════════════════════════════
+   SUPABASE CONFIG
+══════════════════════════════════════ */
+const SUPABASE_URL  = 'https://frvjsvbyhvmohfagxxgb.supabase.co';
+const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZydmpzdmJ5aHZtb2hmYWd4eGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5NDQ3NzEsImV4cCI6MjA5MDUyMDc3MX0.dpCfLm7zk8KmabL6q7lV9BtZ-9oTQmkZPQMZsG7Q2T0';
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* Helper: hiện toast thông báo */
+function showToast(msg, isError = false) {
+  const toast = document.getElementById('toast');
+  const text  = document.getElementById('toastText');
+  const icon  = toast.querySelector('.toast-icon');
+  text.textContent = msg;
+  icon.className = isError ? 'fas fa-times-circle toast-icon' : 'fas fa-check-circle toast-icon';
+  toast.style.background = isError ? '#ef4444' : '';
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3500);
+}
+</script>
+
+<script src="main.js"></script>
+
+<script>
+/* ══════════════════════════════════════
+   MODAL ĐĂNG BÁN
+══════════════════════════════════════ */
+function openSellModal() {
+  document.getElementById('sellOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeSellModal(e) {
+  if (e && e.target !== document.getElementById('sellOverlay')) return;
+  document.getElementById('sellOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('sellCloseBtn').addEventListener('click', () => {
+  document.getElementById('sellOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.getElementById('sellOverlay').classList.remove('open');
+    document.getElementById('checkOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+});
+
+function sellGoStep2() {
+  let ok = true;
+  const step1Checks = [
+    { id:'scat',   errId:'serr-cat',   rowId:'srow-cat',   fn: v => v !== '' },
+    { id:'stitle', errId:'serr-title', rowId:'srow-title', fn: v => v.trim().length >= 5 },
+    { id:'sdesc',  errId:'serr-desc',  rowId:'srow-desc',  fn: v => v.trim().length >= 10 },
+    { id:'scond',  errId:'serr-cond',  rowId:'srow-cond',  fn: v => v !== '' },
+  ];
+  step1Checks.forEach(c => {
+    const val = document.getElementById(c.id).value;
+    const pass = c.fn(val);
+    const row = document.getElementById(c.rowId);
+    const err = document.getElementById(c.errId);
+    if (row) row.classList.toggle('has-err', !pass);
+    if (err) err.style.display = pass ? 'none' : 'block';
+    if (!pass) ok = false;
+  });
+  if (!ok) {
+    document.querySelector('#sellStep1 .has-err')?.scrollIntoView({ behavior:'smooth', block:'center' });
+    return;
+  }
+  document.getElementById('sellStep1').style.display = 'none';
+  document.getElementById('sellStep2').style.display = 'block';
+  document.getElementById('sfooter1').style.display = 'none';
+  document.getElementById('sfooter2').style.display = 'flex';
+  document.getElementById('stab1').classList.remove('active');
+  document.getElementById('stab2').classList.add('active');
+  document.getElementById('sellModal').scrollTop = 0;
+}
+function sellGoStep1() {
+  document.getElementById('sellStep2').style.display = 'none';
+  document.getElementById('sellStep1').style.display = 'block';
+  document.getElementById('sfooter2').style.display = 'none';
+  document.getElementById('sfooter1').style.display = 'flex';
+  document.getElementById('stab2').classList.remove('active');
+  document.getElementById('stab1').classList.add('active');
+  document.getElementById('sellModal').scrollTop = 0;
+}
+
+let sellImgs = [];
+const sellDrop = document.getElementById('sellDropZone');
+sellDrop.addEventListener('dragover', e => { e.preventDefault(); sellDrop.style.background='#dcfce7'; });
+sellDrop.addEventListener('dragleave', () => { sellDrop.style.background=''; });
+sellDrop.addEventListener('drop', e => { e.preventDefault(); sellDrop.style.background=''; sellHandleFiles(e.dataTransfer.files); });
+
+function sellHandleFiles(files) {
+  [...files].forEach(f => {
+    if (sellImgs.length >= 10 || !f.type.startsWith('image/')) return;
+    const r = new FileReader();
+    r.onload = e => { sellImgs.push(e.target.result); sellRenderImgs(); };
+    r.readAsDataURL(f);
+  });
+}
+function sellRenderImgs() {
+  const g = document.getElementById('sellImgGrid'); g.innerHTML = '';
+  sellImgs.forEach((src, i) => {
+    const s = document.createElement('div'); s.className = 'sell-img-slot';
+    s.innerHTML = `<img src="${src}"><button class="sdel" onclick="sellDelImg(${i})">✕</button>`;
+    g.appendChild(s);
+  });
+  if (sellImgs.length < 10) {
+    const a = document.createElement('div'); a.className = 'sell-img-slot';
+    a.innerHTML = '＋'; a.title = 'Thêm ảnh';
+    a.onclick = () => document.getElementById('sellFileInput').click();
+    g.appendChild(a);
+  }
+}
+function sellDelImg(i) { sellImgs.splice(i,1); sellRenderImgs(); }
+
+function sellChip(el, field) {
+  el.closest('.sell-chips').querySelectorAll('.sell-chip').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById(field).value = el.textContent.trim();
+}
+function sellCond(el, val) {
+  document.querySelectorAll('.sell-cond-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('scond').value = val;
+}
+async function sellSubmit() {
+  const price = document.getElementById('sprice').value;
+  const row = document.getElementById('srow-price');
+  const err = document.getElementById('serr-price');
+  const ok = price !== '' && Number(price) > 0;
+  row.classList.toggle('has-err', !ok);
+  err.style.display = ok ? 'none' : 'block';
+  if (!ok) return;
+
+  // Hiện loading
+  const btn = document.querySelector('#sfooter2 .sell-submit-btn');
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+  btn.disabled = true;
+
+  const data = {
+    title:       document.getElementById('stitle').value.trim(),
+    description: document.getElementById('sdesc').value.trim(),
+    category:    document.getElementById('scat').value,
+    condition:   document.getElementById('scond').value,
+    price:       Number(price),
+    warranty:    document.getElementById('swarranty').value,
+    trade_type:  document.getElementById('strade').value,
+    location:    document.getElementById('sloc').value,
+    images:      sellImgs,
+    status:      'pending'
+  };
+
+  const { error } = await db.from('listings').insert([data]);
+
+  btn.innerHTML = '<i class="fas fa-paper-plane"></i> Đăng tin miễn phí';
+  btn.disabled = false;
+
+  if (error) {
+    showToast('Lỗi khi đăng tin: ' + error.message, true);
+    return;
+  }
+
+  showToast('Đăng tin thành công! Đang kiểm duyệt...');
+  document.getElementById('sellStep2').style.display = 'none';
+  document.getElementById('sellFooter').style.display = 'none';
+  document.querySelector('.sell-steps-bar').style.display = 'none';
+  document.getElementById('sellSuccess').classList.add('show');
+}
+function sellReset() {
+  ['stitle','sdesc','scond','sprice','scat','strade'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('swarranty').selectedIndex = 0;
+  document.getElementById('sloc').selectedIndex = 0;
+  document.querySelectorAll('.sell-chip').forEach(c => c.classList.remove('sel'));
+  document.querySelector('#sellStep2 .sell-chip').classList.add('sel');
+  document.getElementById('strade').value = 'meet';
+  document.querySelectorAll('.sell-cond-btn').forEach(b => b.classList.remove('sel'));
+  document.querySelectorAll('.has-err').forEach(r => r.classList.remove('has-err'));
+  document.querySelectorAll('.sell-err').forEach(e => e.style.display='none');
+  sellImgs = []; sellRenderImgs();
+  document.getElementById('sellStep1').style.display = 'block';
+  document.getElementById('sellStep2').style.display = 'none';
+  document.getElementById('sellFooter').style.display = '';
+  document.getElementById('sfooter1').style.display = 'flex';
+  document.getElementById('sfooter2').style.display = 'none';
+  document.getElementById('sellSuccess').classList.remove('show');
+  document.querySelector('.sell-steps-bar').style.display = '';
+  document.getElementById('stab1').classList.add('active');
+  document.getElementById('stab2').classList.remove('active');
+  document.getElementById('sellModal').scrollTop = 0;
+}
+
+/* ══════════════════════════════════════
+   MODAL KIỂM TRA LINH KIỆN
+══════════════════════════════════════ */
+function openCheckModal() {
+  document.getElementById('checkOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('chk-date').min = today;
+  document.getElementById('chk-date').value = today;
+  chkUpdateSummary();
+}
+function closeCheckModal(e) {
+  if (e && e.target !== document.getElementById('checkOverlay')) return;
+  document.getElementById('checkOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('checkCloseBtn').addEventListener('click', () => {
+  document.getElementById('checkOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+});
+
+function chkChip(el, field) {
+  el.closest('.chk-chips').querySelectorAll('.chk-chip').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById(field).value = el.textContent.trim();
+  chkUpdateSummary();
+  const row = el.closest('.chk-row');
+  if (row) row.classList.remove('has-err');
+}
+function chkToggleSvc(el) {
+  el.classList.toggle('sel');
+  const cb = el.querySelector('input[type=checkbox]');
+  if (cb) cb.checked = el.classList.contains('sel');
+  chkUpdateSummary();
+}
+function chkSlot(el) {
+  document.querySelectorAll('.chk-slot').forEach(s => s.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('chk-slot').value = el.textContent.trim();
+  chkUpdateSummary();
+}
+function chkUpdateSummary() {
+  const device  = document.getElementById('chk-device').value;
+  const dateVal = document.getElementById('chk-date').value;
+  const slotVal = document.getElementById('chk-slot').value;
+  const svcs    = [...document.querySelectorAll('.chk-svc-item.sel')].map(s => s.querySelector('strong').textContent);
+  if (!device && !dateVal) return;
+  document.getElementById('chkSummary').classList.add('show');
+  document.getElementById('sum-device').textContent   = device || '–';
+  document.getElementById('sum-datetime').textContent = dateVal ? (dateVal + (slotVal ? ' · ' + slotVal : '')) : '–';
+  document.getElementById('sum-services').textContent = svcs.length ? svcs.join(', ') : 'Tư vấn tổng quát';
+}
+async function checkSubmit() {
+  let ok = true;
+  const name  = document.getElementById('chk-name').value.trim();
+  const phone = document.getElementById('chk-phone').value.trim();
+  const device= document.getElementById('chk-device').value;
+  const date  = document.getElementById('chk-date').value;
+  const checks = [
+    { rowId:'crow-name',   errId:'cerr-name',   pass: name.length >= 2 },
+    { rowId:'crow-phone',  errId:'cerr-phone',  pass: /^0[0-9]{9}$/.test(phone.replace(/\s/g,'')) },
+    { rowId:'crow-device', errId:'cerr-device', pass: device !== '' },
+    { rowId:'crow-date',   errId:'cerr-date',   pass: date !== '' },
+  ];
+  checks.forEach(c => {
+    const row = document.getElementById(c.rowId);
+    const err = document.getElementById(c.errId);
+    row.classList.toggle('has-err', !c.pass);
+    if (err) err.style.display = c.pass ? 'none' : 'block';
+    if (!c.pass) ok = false;
+  });
+  if (!ok) {
+    document.querySelector('#checkFormBody .has-err')?.scrollIntoView({ behavior:'smooth', block:'center' });
+    return;
+  }
+
+  // Hiện loading
+  const btn = document.querySelector('.check-footer .check-submit-btn');
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+  btn.disabled = true;
+
+  const ref  = '#ITC' + Math.floor(10000 + Math.random() * 90000);
+  const svcs = [...document.querySelectorAll('.chk-svc-item.sel')].map(s => s.querySelector('input').value);
+
+  const { error } = await db.from('inspections').insert([{
+    name,
+    phone:       phone.replace(/\s/g,''),
+    device_type: device,
+    services:    svcs,
+    date,
+    time_slot:   document.getElementById('chk-slot').value,
+    note:        document.getElementById('chk-note').value.trim(),
+    ref_code:    ref,
+    status:      'pending'
+  }]);
+
+  btn.innerHTML = '<i class="fas fa-calendar-check"></i> Xác nhận đặt lịch';
+  btn.disabled = false;
+
+  if (error) {
+    showToast('Lỗi khi đặt lịch: ' + error.message, true);
+    return;
+  }
+
+  showToast('Đặt lịch thành công!');
+  document.getElementById('checkRefCode').textContent = 'Mã lịch hẹn: ' + ref;
+  document.getElementById('checkFormBody').style.display = 'none';
+  document.getElementById('checkFooter').style.display   = 'none';
+  document.getElementById('checkSuccess').classList.add('show');
+}
+function checkReset() {
+  document.getElementById('chk-name').value   = '';
+  document.getElementById('chk-phone').value  = '';
+  document.getElementById('chk-note').value   = '';
+  document.getElementById('chk-device').value = '';
+  document.getElementById('chk-slot').value   = '';
+  document.getElementById('chk-date').value   = new Date().toISOString().split('T')[0];
+  document.querySelectorAll('.chk-chip').forEach(c => c.classList.remove('sel'));
+  document.querySelectorAll('.chk-svc-item').forEach(s => {
+    s.classList.remove('sel');
+    const cb = s.querySelector('input'); if(cb) cb.checked = false;
+  });
+  document.querySelectorAll('.chk-slot').forEach(s => s.classList.remove('sel'));
+  document.querySelectorAll('.chk-row.has-err').forEach(r => r.classList.remove('has-err'));
+  document.querySelectorAll('.chk-err').forEach(e => e.style.display = 'none');
+  document.getElementById('chkSummary').classList.remove('show');
+  document.getElementById('checkFormBody').style.display = '';
+  document.getElementById('checkFooter').style.display   = '';
+  document.getElementById('checkSuccess').classList.remove('show');
+  document.getElementById('checkModal').scrollTop = 0;
+}
+
+function showWarranty() {
+  alert("Bảo hành 3-6 tháng, đổi trả trong 7 ngày nếu có lỗi.");
+}
+</script>
+
+</body>
+</html>

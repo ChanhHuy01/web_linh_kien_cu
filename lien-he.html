@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Liên Hệ </title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Style chung của TechParts -->
+  <link rel="stylesheet" href="style.css">
+  <!-- Style riêng trang Liên Hệ -->
+  <link rel="stylesheet" href="lien-he.css">
+</head>
+<body>
+
+<!-- ========================
+     HEADER
+======================== -->
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo"><span>ITC</span></a>
+
+    <div class="search-bar">
+      <input type="text" placeholder="Tìm kiếm CPU, RAM, GPU, Mainboard..." id="searchInput">
+      <button onclick="window.location.href='shop.html'"><i class="fas fa-search"></i></button>
+    </div>
+
+    <nav>
+      <a href="index.html">Trang chủ</a>
+      <a href="shop.html">Mua hàng</a>
+      <a href="sell.html">Bán hàng</a>
+      <a href="lien-he.html" class="active">Liên hệ</a>
+      <a href="orders.html">Đơn hàng</a>
+
+    </nav>
+
+    <div class="header-actions">
+      <button class="cart-btn" onclick="window.location.href='index.html'">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-badge">0</span>
+      </button>
+      <div id="authButtons">
+        <a href="login.html" class="btn-outline">Đăng nhập</a>
+        <a href="login.html?tab=register" class="btn-primary">Đăng ký</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ========================
+     HERO
+======================== -->
+<div class="contact-hero">
+  <div class="badge"><i class="fas fa-headset"></i> Hỗ trợ 24/7</div>
+  <h1>Liên Hệ <span>ITC</span></h1>
+  <p>Chúng tôi luôn sẵn sàng hỗ trợ bạn. Gửi tin nhắn hoặc liên hệ trực tiếp qua các kênh bên dưới.</p>
+</div>
+
+<!-- ========================
+     NỘI DUNG CHÍNH
+======================== -->
+<div class="contact-section">
+
+  <!-- TRÁI: Thông tin liên hệ -->
+  <div class="contact-info">
+
+    <div class="info-card">
+      <div class="info-icon blue"><i class="fas fa-map-marker-alt"></i></div>
+      <div class="info-body">
+        <h4>Địa chỉ</h4>
+        <p>Ký túc xá Việt, đại học Phạm Văn Đồng<br>Quảng Ngãi</p>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-icon orange"><i class="fas fa-phone-alt"></i></div>
+      <div class="info-body">
+        <h4>Điện thoại / Hotline</h4>
+        <a href="tel:0357667793">0357667793</a><br>
+        <a href="tel:02812345678">028 1234 5678</a>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-icon purple"><i class="fas fa-envelope"></i></div>
+      <div class="info-body">
+        <h4>Email</h4>
+        <a href="mailto:support@itc.vn">support@itc.vn</a><br>
+        <a href="mailto:sales@itc.vn">sales@itc.vn</a>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-icon green"><i class="fab fa-facebook-messenger"></i></div>
+      <div class="info-body">
+        <h4>Mạng xã hội</h4>
+        <p>Nhắn tin trực tiếp qua:</p>
+        <div class="social-row" style="margin-top:0.6rem;">
+          <a href="https://www.facebook.com/huychanh.112004" class="social-btn" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://zalo.me/0357667793" class="social-btn" title="Zalo"><i class="fas fa-comment-dots"></i></a>
+          <a href="https://www.youtube.com/@huychanh6645" class="social-btn" title="YouTube"><i class="fab fa-youtube"></i></a>
+          <a href="https://www.tiktok.com/@chanhhuy0111" class="social-link"><i class="fab fa-tiktok"></i></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="hours-card">
+      <h4><i class="fas fa-clock"></i> Giờ làm việc</h4>
+      <div class="hours-row">
+        <span class="day">Thứ Hai – Thứ Sáu</span>
+        <span class="status-open">8:00 – 21:00</span>
+      </div>
+      <div class="hours-row">
+        <span class="day">Thứ Bảy</span>
+        <span class="status-open">8:00 – 18:00</span>
+      </div>
+      <div class="hours-row">
+        <span class="day">Chủ Nhật</span>
+        <span class="status-close">Nghỉ</span>
+      </div>
+      <div class="hours-row">
+        <span class="day">Hotline (0559433481)</span>
+        <span class="status-open">24/7</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PHẢI: Form liên hệ -->
+  <div class="contact-form-wrap">
+
+    <!-- Nội dung form -->
+    <div id="formContent">
+      <div class="form-title">Gửi <span>Tin Nhắn</span></div>
+      <div class="form-subtitle">Điền thông tin bên dưới, chúng tôi sẽ phản hồi trong vòng 2–4 giờ.</div>
+
+      <div class="topic-label">Chủ đề <span style="color:#ef4444;">*</span></div>
+      <div class="topic-chips" id="topicChips">
+        <span class="topic-chip active" onclick="selectTopic(this)">💬 Tư vấn mua hàng</span>
+        <span class="topic-chip" onclick="selectTopic(this)">🔧 Hỗ trợ kỹ thuật</span>
+        <span class="topic-chip" onclick="selectTopic(this)">🏷️ Đăng bán / Seller</span>
+        <span class="topic-chip" onclick="selectTopic(this)">🔄 Đổi trả / Khiếu nại</span>
+        <span class="topic-chip" onclick="selectTopic(this)">🤝 Hợp tác kinh doanh</span>
+        <span class="topic-chip" onclick="selectTopic(this)">❓ Khác</span>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Họ và tên <span>*</span></label>
+          <input type="text" id="fullName" placeholder="Nguyễn Văn A">
+        </div>
+        <div class="form-group">
+          <label>Số điện thoại <span>*</span></label>
+          <input type="tel" id="phone" placeholder="0912 345 678">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Email <span>*</span></label>
+        <input type="email" id="email" placeholder="email@example.com">
+      </div>
+
+      <div class="form-group">
+        <label>Tiêu đề</label>
+        <input type="text" id="subject" placeholder="Tóm tắt vấn đề bạn cần hỗ trợ...">
+      </div>
+
+      <div class="form-group">
+        <label>Nội dung tin nhắn <span>*</span></label>
+        <textarea id="message" placeholder="Mô tả chi tiết vấn đề hoặc câu hỏi của bạn. Chúng tôi sẽ phản hồi trong vòng 2–4 giờ làm việc."></textarea>
+      </div>
+
+      <button class="btn-submit" onclick="submitForm()">
+        <i class="fas fa-paper-plane"></i> Gửi tin nhắn
+      </button>
+    </div>
+
+    <!-- Trạng thái thành công -->
+    <div class="form-success" id="formSuccess">
+      <div class="success-icon"><i class="fas fa-check"></i></div>
+      <h3>Đã gửi thành công! 🎉</h3>
+      <p>Cảm ơn bạn đã liên hệ. Chúng tôi sẽ phản hồi trong vòng <strong>2–4 giờ</strong> làm việc.</p>
+      <button class="btn-back" onclick="resetForm()"><i class="fas fa-arrow-left"></i> Gửi tin nhắn khác</button>
+    </div>
+
+  </div>
+</div>
+<!-- ========================
+     FOOTER
+======================== -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a class="logo" href="index.html">I<span>TC</span></a>
+      <p>Nền tảng mua bán linh kiện máy tính cũ uy tín hàng đầu Việt Nam.</p>
+      <div class="social-links">
+        <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+        <a href="#" class="social-link"><i class="fab fa-tiktok"></i></a>
+        <a href="#" class="social-link"><i class="fab fa-discord"></i></a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h5>Danh mục</h5>
+      <ul>
+        <li><a href="#">CPU / Bộ xử lý</a></li>
+        <li><a href="#">RAM / Bộ nhớ</a></li>
+        <li><a href="#">Card màn hình</a></li>
+        <li><a href="#">Mainboard</a></li>
+        <li><a href="#">SSD / HDD</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Hỗ trợ</h5>
+      <ul>
+        <li><a href="#">Hướng dẫn mua</a></li>
+        <li><a href="#">Hướng dẫn bán</a></li>
+        <li><a href="#">Chính sách đổi trả</a></li>
+        <li><a href="#">Thanh toán</a></li>
+        <li><a href="lien-he.html">Liên hệ</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Công ty</h5>
+      <ul>
+        <li><a href="lien-he.html">Liên hệ</a></li>
+        <li><a href="#">Tuyển dụng</a></li>
+        <li><a href="#">Điều khoản sử dụng</a></li>
+        <li><a href="#">Chính sách bảo mật</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<!-- JS riêng trang Liên Hệ (đặt cuối body) -->
+<script src="lien-he.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đơn hàng của tôi - ITC</title>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── PAGE LAYOUT ── */
+    .orders-hero {
+      background: #ffffff;
+      border-bottom: 2px solid #e5e7eb;
+      padding: 2.5rem 2rem 2rem;
+    }
+    .orders-hero-inner {
+      max-width: 1000px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .orders-hero h1 {
+      font-size: 1.6rem; font-weight: 900; color: #111827;
+    }
+    .orders-hero h1 span { color: #22c55e; }
+    .orders-hero p { font-size: 0.85rem; color: #6b7280; margin-top: 0.3rem; }
+
+    .orders-wrap {
+      max-width: 1000px; margin: 2rem auto; padding: 0 2rem 4rem;
+    }
+
+    /* ── STATS BAR ── */
+    .stats-bar {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 1rem; margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: #fff; border: 2px solid #e5e7eb;
+      border-radius: 12px; padding: 1.1rem 1.2rem;
+      display: flex; align-items: center; gap: 0.9rem;
+      transition: border-color 0.2s;
+    }
+    .stat-card:hover { border-color: #22c55e; }
+    .stat-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; flex-shrink: 0;
+    }
+    .stat-icon.green  { background: #dcfce7; color: #16a34a; }
+    .stat-icon.orange { background: #ffedd5; color: #f97316; }
+    .stat-icon.blue   { background: #dbeafe; color: #3b82f6; }
+    .stat-icon.red    { background: #fee2e2; color: #ef4444; }
+    .stat-info h4 { font-size: 1.2rem; font-weight: 900; color: #111827; font-family: 'Space Mono', monospace; }
+    .stat-info p  { font-size: 0.75rem; color: #6b7280; margin-top: 0.1rem; }
+
+    /* ── FILTER BAR ── */
+    .orders-filter {
+      display: flex; gap: 0.5rem; flex-wrap: wrap;
+      margin-bottom: 1.5rem; align-items: center;
+    }
+    .o-filter-btn {
+      padding: 0.45rem 1rem; border-radius: 20px;
+      background: #f9fafb; border: 1.5px solid #e5e7eb;
+      font-family: inherit; font-size: 0.82rem; font-weight: 600;
+      color: #6b7280; cursor: pointer; transition: all 0.2s;
+    }
+    .o-filter-btn:hover,
+    .o-filter-btn.active { background: #dcfce7; border-color: #22c55e; color: #16a34a; }
+    .o-search {
+      margin-left: auto; display: flex; align-items: center;
+      border: 1.5px solid #e5e7eb; border-radius: 8px; overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .o-search:focus-within { border-color: #22c55e; }
+    .o-search input {
+      padding: 0.45rem 0.9rem; border: none; outline: none;
+      font-family: inherit; font-size: 0.85rem; color: #111827;
+      background: #fff; width: 200px;
+    }
+    .o-search button {
+      padding: 0.45rem 0.8rem; background: #22c55e;
+      border: none; color: white; cursor: pointer; font-size: 0.85rem;
+    }
+
+    /* ── ORDER CARD ── */
+    .order-card {
+      background: #fff; border: 2px solid #e5e7eb;
+      border-radius: 14px; margin-bottom: 1.2rem;
+      overflow: hidden; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .order-card:hover { border-color: #22c55e; box-shadow: 0 4px 16px rgba(34,197,94,0.08); }
+
+    .order-card-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.9rem 1.3rem;
+      background: #f9fafb; border-bottom: 1px solid #e5e7eb;
+      flex-wrap: wrap; gap: 0.5rem;
+    }
+    .order-id {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85rem; font-weight: 700; color: #111827;
+    }
+    .order-time { font-size: 0.78rem; color: #9ca3af; }
+    .order-status {
+      padding: 0.25rem 0.8rem; border-radius: 20px;
+      font-size: 0.75rem; font-weight: 700;
+    }
+    .status-pending  { background: #fef9c3; color: #92400e; border: 1px solid #fde047; }
+    .status-confirmed{ background: #dbeafe; color: #1d4ed8; border: 1px solid #93c5fd; }
+    .status-shipping { background: #ffedd5; color: #c2410c; border: 1px solid #fdba74; }
+    .status-done     { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+    .status-cancelled{ background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+
+    .order-card-body { padding: 1rem 1.3rem; }
+
+    /* Items trong đơn */
+    .order-items { margin-bottom: 0.9rem; }
+    .order-item {
+      display: flex; align-items: center; gap: 0.8rem;
+      padding: 0.5rem 0; border-bottom: 1px dashed #f3f4f6;
+    }
+    .order-item:last-child { border-bottom: none; }
+    .order-item-name { flex: 1; font-size: 0.85rem; font-weight: 600; color: #374151; }
+    .order-item-qty  { font-size: 0.8rem; color: #9ca3af; }
+    .order-item-price{ font-size: 0.85rem; font-weight: 700; color: #f97316; white-space: nowrap; }
+
+    /* Info khách hàng */
+    .order-info-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0.5rem 1.5rem; margin-top: 0.8rem;
+      padding-top: 0.8rem; border-top: 1px solid #f3f4f6;
+    }
+    .order-info-item { font-size: 0.8rem; color: #6b7280; }
+    .order-info-item strong { color: #374151; }
+
+    /* Footer card */
+    .order-card-foot {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.8rem 1.3rem;
+      background: #f9fafb; border-top: 1px solid #e5e7eb;
+      flex-wrap: wrap; gap: 0.5rem;
+    }
+    .order-total-label { font-size: 0.82rem; color: #6b7280; }
+    .order-total-price {
+      font-size: 1.1rem; font-weight: 900; color: #f97316;
+      font-family: 'Space Mono', monospace;
+    }
+    .order-actions { display: flex; gap: 0.5rem; }
+    .btn-print {
+      padding: 0.4rem 1rem; border-radius: 7px;
+      background: #22c55e; border: none; color: white;
+      font-family: inherit; font-size: 0.8rem; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .btn-print:hover { background: #16a34a; }
+    .btn-cancel {
+      padding: 0.4rem 1rem; border-radius: 7px;
+      background: none; border: 1.5px solid #e5e7eb; color: #9ca3af;
+      font-family: inherit; font-size: 0.8rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-cancel:hover { border-color: #ef4444; color: #ef4444; }
+
+    /* Toggle chi tiết */
+    .btn-toggle {
+      padding: 0.4rem 1rem; border-radius: 7px;
+      background: none; border: 1.5px solid #e5e7eb; color: #6b7280;
+      font-family: inherit; font-size: 0.8rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-toggle:hover { border-color: #22c55e; color: #22c55e; }
+
+    .order-detail { display: none; }
+    .order-detail.open { display: block; }
+
+    /* EMPTY STATE */
+    .empty-orders {
+      text-align: center; padding: 5rem 2rem;
+      color: #9ca3af;
+    }
+    .empty-orders i { font-size: 4rem; opacity: 0.3; margin-bottom: 1rem; display: block; }
+    .empty-orders h3 { font-size: 1.1rem; font-weight: 700; color: #6b7280; margin-bottom: 0.5rem; }
+    .empty-orders p { font-size: 0.85rem; margin-bottom: 1.5rem; }
+    .btn-go-shop {
+      padding: 0.7rem 2rem; background: #22c55e; border: none;
+      border-radius: 10px; color: white; font-family: inherit;
+      font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+      text-decoration: none; display: inline-block;
+    }
+    .btn-go-shop:hover { background: #16a34a; transform: translateY(-1px); }
+
+    /* ── PRINT MODAL (bill in-page) ── */
+    #billModal {
+      display: none; position: fixed; inset: 0; z-index: 5000;
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+      align-items: center; justify-content: center; padding: 1rem;
+    }
+    #billModal.open { display: flex; }
+    #billBox {
+      background: #fff; border-radius: 14px;
+      width: 100%; max-width: 480px;
+      max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      animation: billIn 0.3s ease;
+    }
+    @keyframes billIn {
+      from { opacity:0; transform:translateY(-20px) scale(0.97); }
+      to   { opacity:1; transform:translateY(0) scale(1); }
+    }
+    .bill-head {
+      text-align: center; padding: 1.5rem 1.5rem 1rem;
+      border-bottom: 2px dashed #e5e7eb;
+    }
+    .bill-head .bill-logo {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.5rem; font-weight: 700; color: #111827;
+      margin-bottom: 0.3rem;
+    }
+    .bill-head .bill-logo span { color: #22c55e; }
+    .bill-head p { font-size: 0.78rem; color: #9ca3af; }
+    .bill-title {
+      font-size: 1rem; font-weight: 800; color: #111827;
+      margin: 0.8rem 0 0.2rem; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .bill-id {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.82rem; color: #22c55e; font-weight: 700;
+    }
+    .bill-section { padding: 1rem 1.5rem; border-bottom: 1px dashed #e5e7eb; }
+    .bill-section-title {
+      font-size: 0.72rem; font-weight: 700; color: #9ca3af;
+      text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.6rem;
+    }
+    .bill-row {
+      display: flex; justify-content: space-between;
+      font-size: 0.83rem; margin-bottom: 0.35rem; color: #374151;
+    }
+    .bill-row .label { color: #9ca3af; }
+    .bill-row .value { font-weight: 600; color: #111827; }
+    .bill-item-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.45rem 0; border-bottom: 1px dotted #f3f4f6; font-size: 0.83rem;
+    }
+    .bill-item-row:last-child { border-bottom: none; }
+    .bill-item-name { color: #374151; flex: 1; }
+    .bill-item-qty  { color: #9ca3af; margin: 0 0.8rem; }
+    .bill-item-price{ font-weight: 700; color: #f97316; }
+    .bill-total-section {
+      padding: 1rem 1.5rem;
+      background: #f0fdf4; border-bottom: 1px dashed #e5e7eb;
+    }
+    .bill-total-row {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .bill-total-label { font-size: 0.9rem; font-weight: 700; color: #374151; }
+    .bill-total-amount {
+      font-size: 1.3rem; font-weight: 900; color: #f97316;
+      font-family: 'Space Mono', monospace;
+    }
+    .bill-foot {
+      padding: 1.2rem 1.5rem; text-align: center;
+    }
+    .bill-foot p { font-size: 0.78rem; color: #9ca3af; line-height: 1.7; }
+    .bill-actions {
+      display: flex; gap: 0.7rem; margin-top: 1rem; justify-content: center;
+    }
+    .btn-bill-print {
+      padding: 0.6rem 1.5rem; background: #22c55e; border: none;
+      border-radius: 8px; color: white; font-family: inherit;
+      font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-bill-print:hover { background: #16a34a; }
+    .btn-bill-close {
+      padding: 0.6rem 1.5rem; background: none;
+      border: 1.5px solid #e5e7eb; border-radius: 8px;
+      color: #6b7280; font-family: inherit; font-size: 0.88rem;
+      font-weight: 600; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-bill-close:hover { border-color: #ef4444; color: #ef4444; }
+
+    @media (max-width: 640px) {
+      .stats-bar { grid-template-columns: 1fr 1fr; }
+      .order-info-grid { grid-template-columns: 1fr; }
+      .o-search { margin-left: 0; width: 100%; }
+      .o-search input { width: 100%; }
+    }
+
+    @media print {
+      body * { visibility: hidden; }
+      #billBox, #billBox * { visibility: visible; }
+      #billBox { position: fixed; inset: 0; max-height: none; border-radius: 0; box-shadow: none; }
+      .bill-actions { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">ITC</a>
+    <div class="search-bar" style="max-width:360px;">
+      <input type="text" placeholder="Tìm kiếm sản phẩm...">
+      <button><i class="fas fa-search"></i></button>
+    </div>
+    <nav>
+      <a href="index.html">Trang chủ</a>
+      <a href="shop.html">Mua hàng</a>
+      <a href="sell.html">Bán hàng</a>
+      <a href="lien-he.html">Liên hệ</a>
+      <a href="orders.html">Đơn hàng</a>
+    </nav>
+    <button class="cart-btn" onclick="showCart()">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-badge" id="cartBadge">0</span>
+      </button>
+    <div class="header-actions">
+      <div id="authButtons">
+        <a href="login.html" class="btn-outline">Đăng nhập</a>
+        <a href="login.html?tab=register" class="btn-primary">Đăng ký</a>
+      </div>
+      <div id="userMenu" style="display:none; align-items:center; gap:0.8rem;">
+        <div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0.9rem;background:rgba(34,197,94,0.08);border:1px solid #e5e7eb;border-radius:8px;">
+          <div style="width:28px;height:28px;border-radius:50%;background:#7c3aed;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:white;" id="userAvatar">U</div>
+          <span style="font-size:0.88rem;font-weight:600;" id="userName">User</span>
+        </div>
+        <button onclick="logout()" style="padding:0.45rem 1rem;border:1px solid rgba(239,68,68,0.5);border-radius:6px;background:none;color:#ef4444;font-family:inherit;font-size:0.85rem;font-weight:600;cursor:pointer;">
+          <i class="fas fa-sign-out-alt"></i> Đăng xuất
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="orders-hero">
+  <div class="orders-hero-inner">
+    <div>
+      <h1>Đơn Hàng <span>Của Tôi</span></h1>
+      <p>Theo dõi và quản lý tất cả đơn hàng đã đặt</p>
+    </div>
+    <a href="index.html" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.3rem;background:#22c55e;border-radius:9px;color:white;text-decoration:none;font-size:0.88rem;font-weight:700;transition:all 0.2s;" onmouseover="this.style.background='#16a34a'" onmouseout="this.style.background='#22c55e'">
+      <i class="fas fa-plus"></i> Mua thêm
+    </a>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="orders-wrap">
+
+  <!-- STATS -->
+  <div class="stats-bar" id="statsBar">
+    <div class="stat-card">
+      <div class="stat-icon green"><i class="fas fa-receipt"></i></div>
+      <div class="stat-info"><h4 id="statTotal">0</h4><p>Tổng đơn hàng</p></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon orange"><i class="fas fa-clock"></i></div>
+      <div class="stat-info"><h4 id="statPending">0</h4><p>Chờ xử lý</p></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon blue"><i class="fas fa-check-circle"></i></div>
+      <div class="stat-info"><h4 id="statDone">0</h4><p>Hoàn thành</p></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon red"><i class="fas fa-won-sign"></i></div>
+      <div class="stat-info"><h4 id="statSpent">0₫</h4><p>Tổng chi tiêu</p></div>
+    </div>
+  </div>
+
+  <!-- FILTER -->
+  <div class="orders-filter">
+    <button class="o-filter-btn active" onclick="filterOrders('all', this)">Tất cả</button>
+    <button class="o-filter-btn" onclick="filterOrders('pending', this)">⏳ Chờ xử lý</button>
+    <button class="o-filter-btn" onclick="filterOrders('confirmed', this)">✅ Đã xác nhận</button>
+    <button class="o-filter-btn" onclick="filterOrders('done', this)">📦 Hoàn thành</button>
+    <button class="o-filter-btn" onclick="filterOrders('cancelled', this)">❌ Đã hủy</button>
+    <div class="o-search">
+      <input type="text" id="orderSearch" placeholder="Tìm mã đơn, tên KH..." oninput="searchOrders(this.value)">
+      <button><i class="fas fa-search"></i></button>
+    </div>
+  </div>
+
+  <!-- ORDERS LIST -->
+  <div id="ordersList"></div>
+
+</div>
+
+<!-- BILL MODAL -->
+<div id="billModal" onclick="closeBill(event)">
+  <div id="billBox" id="billBoxInner"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <i class="fas fa-check-circle toast-icon"></i>
+  <span class="toast-text" id="toastText"></span>
+</div>
+
+<script>
+// ── Load orders từ localStorage ──
+let allOrders = JSON.parse(localStorage.getItem('itc_orders') || '[]');
+let currentFilter = 'all';
+
+// Gán trạng thái mặc định nếu chưa có
+allOrders = allOrders.map(o => ({
+  ...o,
+  status: o.status || 'pending'
+}));
+
+// ── Render stats ──
+function renderStats() {
+  const total   = allOrders.length;
+  const pending = allOrders.filter(o => o.status === 'pending').length;
+  const done    = allOrders.filter(o => o.status === 'done').length;
+  const spent   = allOrders.reduce((s, o) => s + (o.total || 0), 0);
+
+  document.getElementById('statTotal').textContent   = total;
+  document.getElementById('statPending').textContent = pending;
+  document.getElementById('statDone').textContent    = done;
+  document.getElementById('statSpent').textContent   =
+    spent > 0 ? (spent / 1_000_000).toFixed(1) + 'M₫' : '0₫';
+}
+
+// ── Render danh sách đơn ──
+const statusLabel = {
+  pending:   '<span class="order-status status-pending">⏳ Chờ xử lý</span>',
+  confirmed: '<span class="order-status status-confirmed">✅ Đã xác nhận</span>',
+  shipping:  '<span class="order-status status-shipping">🚚 Đang giao</span>',
+  done:      '<span class="order-status status-done">📦 Hoàn thành</span>',
+  cancelled: '<span class="order-status status-cancelled">❌ Đã hủy</span>',
+};
+
+function renderOrders(list) {
+  const el = document.getElementById('ordersList');
+  if (!list.length) {
+    el.innerHTML = `
+      <div class="empty-orders">
+        <i class="fas fa-box-open"></i>
+        <h3>Chưa có đơn hàng nào</h3>
+        <p>Hãy chọn sản phẩm và đặt hàng ngay!</p>
+        <a href="index.html" class="btn-go-shop"><i class="fas fa-shopping-cart"></i> Mua hàng ngay</a>
+      </div>`;
+    return;
+  }
+
+  el.innerHTML = list.map((o, idx) => {
+    const itemsHtml = (o.items || []).map(it => `
+      <div class="order-item">
+        <span class="order-item-name">${it.name}</span>
+        <span class="order-item-qty">× ${it.qty}</span>
+        <span class="order-item-price">${(it.price * it.qty).toLocaleString('vi-VN')}₫</span>
+      </div>
+    `).join('');
+
+    const c = o.customer || {};
+    const payIcon = o.payment === 'COD' ? '💵' : o.payment === 'Chuyển khoản' ? '🏦' : '📱';
+
+    return `
+      <div class="order-card" id="card-${o.id}">
+        <div class="order-card-head">
+          <div>
+            <div class="order-id"><i class="fas fa-hashtag" style="color:#22c55e;margin-right:0.3rem;"></i>${o.id}</div>
+            <div class="order-time"><i class="fas fa-clock" style="margin-right:0.3rem;"></i>${o.time || 'Không rõ'}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:0.6rem;">
+            ${statusLabel[o.status] || statusLabel.pending}
+            <button class="btn-toggle" onclick="toggleDetail('${o.id}')">
+              <i class="fas fa-chevron-down"></i> Chi tiết
+            </button>
+          </div>
+        </div>
+
+        <!-- Preview 2 sản phẩm đầu -->
+        <div class="order-card-body">
+          <div class="order-items">
+            ${(o.items || []).slice(0,2).map(it => `
+              <div class="order-item">
+                <span class="order-item-name">${it.name}</span>
+                <span class="order-item-qty">× ${it.qty}</span>
+                <span class="order-item-price">${(it.price*it.qty).toLocaleString('vi-VN')}₫</span>
+              </div>`).join('')}
+            ${(o.items||[]).length > 2 ? `<div style="font-size:0.78rem;color:#9ca3af;padding-top:0.3rem;">+${o.items.length-2} sản phẩm khác...</div>` : ''}
+          </div>
+        </div>
+
+        <!-- Chi tiết (ẩn mặc định) -->
+        <div class="order-detail" id="detail-${o.id}">
+          <div class="order-card-body" style="border-top:1px dashed #e5e7eb;">
+            <div style="font-size:0.78rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.6rem;">Tất cả sản phẩm</div>
+            <div class="order-items">${itemsHtml}</div>
+            <div class="order-info-grid">
+              <div class="order-info-item">👤 Khách hàng: <strong>${c.name || '—'}</strong></div>
+              <div class="order-info-item">📞 SĐT: <strong>${c.phone || '—'}</strong></div>
+              <div class="order-info-item" style="grid-column:1/-1;">📍 Địa chỉ: <strong>${c.address || '—'}</strong></div>
+              <div class="order-info-item">${payIcon} Thanh toán: <strong>${o.payment || '—'}</strong></div>
+              ${c.note ? `<div class="order-info-item">📝 Ghi chú: <strong>${c.note}</strong></div>` : ''}
+            </div>
+          </div>
+        </div>
+
+        <div class="order-card-foot">
+          <div>
+            <div class="order-total-label">Tổng tiền đơn hàng</div>
+            <div class="order-total-price">${(o.total||0).toLocaleString('vi-VN')}₫</div>
+          </div>
+          <div class="order-actions">
+            <button class="btn-print" onclick="showBill('${o.id}')">
+              <i class="fas fa-receipt"></i> Xem bill
+            </button>
+            ${o.status === 'pending' ? `
+            <button class="btn-cancel" onclick="cancelOrder('${o.id}')">
+              <i class="fas fa-times"></i> Hủy đơn
+            </button>` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ── Toggle chi tiết ──
+function toggleDetail(id) {
+  const el = document.getElementById('detail-' + id);
+  el.classList.toggle('open');
+}
+
+// ── Filter ──
+function filterOrders(status, btn) {
+  currentFilter = status;
+  document.querySelectorAll('.o-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const filtered = status === 'all'
+    ? allOrders
+    : allOrders.filter(o => o.status === status);
+  renderOrders(filtered);
+}
+
+// ── Search ──
+function searchOrders(q) {
+  q = q.toLowerCase().trim();
+  const list = allOrders.filter(o =>
+    o.id.toLowerCase().includes(q) ||
+    (o.customer?.name || '').toLowerCase().includes(q) ||
+    (o.customer?.phone || '').includes(q)
+  );
+  renderOrders(list);
+}
+
+// ── Hủy đơn ──
+function cancelOrder(id) {
+  if (!confirm('Bạn có chắc muốn hủy đơn hàng này?')) return;
+  const o = allOrders.find(x => x.id === id);
+  if (o) {
+    o.status = 'cancelled';
+    localStorage.setItem('itc_orders', JSON.stringify(allOrders));
+    renderStats();
+    filterOrders(currentFilter, document.querySelector('.o-filter-btn.active'));
+    showToast('Đã hủy đơn hàng ' + id);
+  }
+}
+
+// ── Hiện bill ──
+function showBill(id) {
+  const o = allOrders.find(x => x.id === id);
+  if (!o) return;
+  const c = o.customer || {};
+  const payIcon = o.payment === 'COD' ? '💵' : o.payment === 'Chuyển khoản' ? '🏦' : '📱';
+
+  document.getElementById('billBox').innerHTML = `
+    <div class="bill-head">
+      <div class="bill-logo">I<span>TC</span></div>
+      <p>Công ty Điện tử Tin học ITC<br>Mua bán linh kiện máy tính cũ uy tín</p>
+      <div class="bill-title">Hóa Đơn Mua Hàng</div>
+      <div class="bill-id">${o.id}</div>
+    </div>
+
+    <div class="bill-section">
+      <div class="bill-section-title">Thông tin đơn hàng</div>
+      <div class="bill-row"><span class="label">Thời gian:</span><span class="value">${o.time || '—'}</span></div>
+      <div class="bill-row"><span class="label">Trạng thái:</span><span class="value">${
+        {pending:'Chờ xử lý', confirmed:'Đã xác nhận', shipping:'Đang giao', done:'Hoàn thành', cancelled:'Đã hủy'}[o.status] || 'Chờ xử lý'
+      }</span></div>
+      <div class="bill-row"><span class="label">Thanh toán:</span><span class="value">${payIcon} ${o.payment || '—'}</span></div>
+    </div>
+
+    <div class="bill-section">
+      <div class="bill-section-title">Thông tin khách hàng</div>
+      <div class="bill-row"><span class="label">Họ tên:</span><span class="value">${c.name || '—'}</span></div>
+      <div class="bill-row"><span class="label">Điện thoại:</span><span class="value">${c.phone || '—'}</span></div>
+      <div class="bill-row"><span class="label">Địa chỉ:</span><span class="value">${c.address || '—'}</span></div>
+      ${c.note ? `<div class="bill-row"><span class="label">Ghi chú:</span><span class="value">${c.note}</span></div>` : ''}
+    </div>
+
+    <div class="bill-section">
+      <div class="bill-section-title">Sản phẩm</div>
+      ${(o.items||[]).map(it => `
+        <div class="bill-item-row">
+          <span class="bill-item-name">${it.name}</span>
+          <span class="bill-item-qty">× ${it.qty}</span>
+          <span class="bill-item-price">${(it.price*it.qty).toLocaleString('vi-VN')}₫</span>
+        </div>`).join('')}
+    </div>
+
+    <div class="bill-total-section">
+      <div class="bill-total-row">
+        <span class="bill-total-label">TỔNG CỘNG</span>
+        <span class="bill-total-amount">${(o.total||0).toLocaleString('vi-VN')}₫</span>
+      </div>
+    </div>
+
+    <div class="bill-foot">
+      <p>Cảm ơn bạn đã mua hàng tại ITC!<br>Mọi thắc mắc vui lòng liên hệ hotline hoặc Zalo.</p>
+      <div class="bill-actions">
+        <button class="btn-bill-print" onclick="window.print()"><i class="fas fa-print"></i> In hóa đơn</button>
+        <button class="btn-bill-close" onclick="closeBill()">Đóng</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('billModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeBill(e) {
+  if (e && e.target !== document.getElementById('billModal')) return;
+  document.getElementById('billModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ── Toast ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastText').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── Auth ──
+function checkAuthState() {
+  const user = sessionStorage.getItem('currentUser');
+  if (!user) return;
+  const { name } = JSON.parse(user);
+  const displayName = name.charAt(0).toUpperCase() + name.slice(1);
+  document.getElementById('authButtons').style.display = 'none';
+  document.getElementById('userMenu').style.display = 'flex';
+  document.getElementById('userName').textContent   = displayName;
+  document.getElementById('userAvatar').textContent = displayName.charAt(0).toUpperCase();
+}
+function logout() {
+  sessionStorage.removeItem('currentUser');
+  sessionStorage.removeItem('noticeSeen');
+  document.getElementById('authButtons').style.display = 'flex';
+  document.getElementById('userMenu').style.display = 'none';
+  showToast('Đã đăng xuất!');
+}
+
+// ── INIT ──
+checkAuthState();
+renderStats();
+renderOrders(allOrders);
+</script>
+</body>
+</html>

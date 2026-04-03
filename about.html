@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechParts - Về Chúng Tôi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="about.css">
+</head>
+<body>
+
+<div class="toast" id="toast">
+  <i class="fas fa-check-circle toast-icon"></i>
+  <span class="toast-text" id="toastText"></span>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">Tech<span>Parts</span></a>
+    <div class="search-bar">
+      <input type="text" placeholder="Tìm kiếm linh kiện...">
+      <button><i class="fas fa-search"></i></button>
+    </div>
+    <nav>
+      <a href="index.html">Trang chủ</a>
+      <a href="shop.html">Mua hàng</a>
+      <a href="sell.html">Bán hàng</a>
+      <a href="about.html" class="active">Liên hệ</a>
+    </nav>
+    <div class="header-actions">
+      <button class="cart-btn"><i class="fas fa-shopping-cart"></i><span class="cart-badge">0</span></button>
+      <div id="authButtons">
+        <a href="login.html" class="btn-outline">Đăng nhập</a>
+        <a href="login.html?tab=register" class="btn-primary">Đăng ký</a>
+      </div>
+      <div id="userMenu" style="display:none;align-items:center;gap:0.8rem;">
+        <div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0.9rem;background:rgba(0,212,255,0.08);border:1px solid var(--border);border-radius:8px;">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--accent3);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:white;" id="userAvatar">U</div>
+          <span style="font-size:0.88rem;font-weight:600;" id="userName">User</span>
+        </div>
+        <button onclick="logout()" style="padding:0.45rem 1rem;border:1px solid rgba(239,68,68,0.5);border-radius:6px;background:none;color:#ef4444;font-family:inherit;font-size:0.85rem;font-weight:600;cursor:pointer;"><i class="fas fa-sign-out-alt"></i> Đăng xuất</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="about-hero">
+  <div class="about-hero-inner">
+    <div class="about-hero-text">
+      <div class="about-badge"><i class="fas fa-microchip"></i> Được thành lập năm 2021</div>
+      <h1>Chúng tôi xây dựng<br>nền tảng <span>linh kiện cũ</span><br>đáng tin nhất Việt Nam</h1>
+      <p>TechParts ra đời từ niềm đam mê công nghệ và trăn trở về sự thiếu minh bạch trong thị trường linh kiện máy tính cũ. Chúng tôi tin rằng mọi người đều xứng đáng được tiếp cận phần cứng chất lượng với giá hợp lý.</p>
+      <div class="about-hero-cta">
+        <a href="shop.html" class="btn-primary" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;padding:0.8rem 1.8rem;border-radius:10px;font-weight:700;">
+          <i class="fas fa-store"></i> Khám phá cửa hàng
+        </a>
+        <a href="#contact" class="btn-outline" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;padding:0.8rem 1.8rem;border-radius:10px;font-weight:700;">
+          <i class="fas fa-envelope"></i> Liên hệ chúng tôi
+        </a>
+      </div>
+    </div>
+    <div class="about-hero-visual">
+      <div class="visual-ring ring-1"></div>
+      <div class="visual-ring ring-2"></div>
+      <div class="visual-ring ring-3"></div>
+      <div class="visual-center">
+        <span>⚙️</span>
+        <p>TechParts</p>
+      </div>
+      <div class="floating-tag t1">💻 i7-12700K</div>
+      <div class="floating-tag t2">🎮 RTX 3070</div>
+      <div class="floating-tag t3">🧩 32GB DDR5</div>
+      <div class="floating-tag t4">💾 1TB NVMe</div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats-section">
+  <div class="stats-inner">
+    <div class="stat-item" data-count="50000" data-suffix="+">
+      <div class="stat-num" id="stat-0">0</div>
+      <div class="stat-label">Giao dịch thành công</div>
+    </div>
+    <div class="stat-item" data-count="8500" data-suffix="+">
+      <div class="stat-num" id="stat-1">0</div>
+      <div class="stat-label">Người bán tin cậy</div>
+    </div>
+    <div class="stat-item" data-count="99" data-suffix="%">
+      <div class="stat-num" id="stat-2">0</div>
+      <div class="stat-label">Khách hàng hài lòng</div>
+    </div>
+    <div class="stat-item" data-count="4" data-suffix=" năm">
+      <div class="stat-num" id="stat-3">0</div>
+      <div class="stat-label">Kinh nghiệm hoạt động</div>
+    </div>
+  </div>
+</section>
+
+<!-- MISSION -->
+<section class="mission-section">
+  <div class="section-inner">
+    <div class="mission-grid">
+      <div class="mission-text">
+        <div class="section-label"><i class="fas fa-bullseye"></i> Sứ mệnh của chúng tôi</div>
+        <h2>Tạo ra thị trường<br>linh kiện cũ <span>minh bạch và an toàn</span></h2>
+        <p>Chúng tôi hiểu rằng mua linh kiện cũ từng là canh bạc — không biết hàng có đúng mô tả không, có bị lừa không, ai chịu trách nhiệm khi có vấn đề.</p>
+        <p>TechParts giải quyết điều đó bằng hệ thống kiểm duyệt tin đăng, escrow thanh toán và chính sách bảo vệ người mua rõ ràng.</p>
+        <div class="mission-points">
+          <div class="mp-item"><i class="fas fa-check-circle"></i><span>Kiểm tra kỹ lưỡng mọi tin đăng trước khi duyệt</span></div>
+          <div class="mp-item"><i class="fas fa-check-circle"></i><span>Escrow giữ tiền đến khi người mua xác nhận nhận hàng</span></div>
+          <div class="mp-item"><i class="fas fa-check-circle"></i><span>Hỗ trợ giải quyết tranh chấp trong 24 giờ</span></div>
+          <div class="mp-item"><i class="fas fa-check-circle"></i><span>Đổi trả trong 7 ngày nếu không đúng mô tả</span></div>
+        </div>
+      </div>
+      <div class="mission-visual">
+        <div class="trust-card">
+          <div class="tc-icon"><i class="fas fa-shield-alt"></i></div>
+          <h4>Bảo vệ người mua</h4>
+          <p>Giữ thanh toán an toàn đến khi bạn xác nhận đã nhận hàng đúng mô tả</p>
+          <div class="tc-badge">Escrow Payment</div>
+        </div>
+        <div class="trust-card" style="margin-top:1rem;">
+          <div class="tc-icon orange"><i class="fas fa-search-plus"></i></div>
+          <h4>Kiểm duyệt nghiêm ngặt</h4>
+          <p>Đội ngũ kỹ thuật xem xét mọi tin đăng, loại bỏ thông tin sai lệch và giá ảo</p>
+          <div class="tc-badge orange">Verified Listing</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VALUES -->
+<section class="values-section">
+  <div class="section-inner">
+    <div class="section-center-header">
+      <div class="section-label"><i class="fas fa-heart"></i> Giá trị cốt lõi</div>
+      <h2>Những gì chúng tôi<br>cam kết mỗi ngày</h2>
+    </div>
+    <div class="values-grid">
+      <div class="value-card">
+        <div class="vc-icon"><i class="fas fa-eye"></i></div>
+        <h4>Minh bạch</h4>
+        <p>Mọi thông tin về sản phẩm, người bán, lịch sử giao dịch đều được hiển thị rõ ràng. Không có thông tin ẩn, không giá ảo.</p>
+      </div>
+      <div class="value-card">
+        <div class="vc-icon green"><i class="fas fa-handshake"></i></div>
+        <h4>Tin cậy</h4>
+        <p>Hệ thống đánh giá người bán, lịch sử giao dịch xác minh và bảo hiểm giao dịch giúp bạn mua bán tự tin hơn.</p>
+      </div>
+      <div class="value-card">
+        <div class="vc-icon orange"><i class="fas fa-bolt"></i></div>
+        <h4>Hiệu quả</h4>
+        <p>Quy trình đăng bán 4 bước, kiểm duyệt trong 2–4 giờ, thanh toán ngay khi giao dịch hoàn tất — không chờ đợi.</p>
+      </div>
+      <div class="value-card">
+        <div class="vc-icon purple"><i class="fas fa-users"></i></div>
+        <h4>Cộng đồng</h4>
+        <p>Xây dựng cộng đồng tech Việt Nam lành mạnh, nơi người mua và bán đều được tôn trọng và bảo vệ quyền lợi.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="team-section">
+  <div class="section-inner">
+    <div class="section-center-header">
+      <div class="section-label"><i class="fas fa-users"></i> Đội ngũ sáng lập</div>
+      <h2>Những người xây dựng<br>TechParts</h2>
+    </div>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="team-avatar" style="background:linear-gradient(135deg,#0f1923,#1a3a5c);">
+          <span>🧑‍💻</span>
+        </div>
+        <div class="team-info">
+          <h4>Nguyễn Minh Hoàng</h4>
+          <p class="team-role">Co-founder & CEO</p>
+          <p class="team-bio">10 năm kinh nghiệm trong ngành phân phối linh kiện máy tính. Từng làm việc tại các tập đoàn công nghệ lớn trước khi khởi nghiệp.</p>
+          <div class="team-socials">
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar" style="background:linear-gradient(135deg,#1a1040,#2d1b69);">
+          <span>👩‍💼</span>
+        </div>
+        <div class="team-info">
+          <h4>Trần Thanh Tú</h4>
+          <p class="team-role">Co-founder & COO</p>
+          <p class="team-bio">Chuyên gia vận hành và xây dựng quy trình, đảm bảo mọi giao dịch trên TechParts đều diễn ra trơn tru và an toàn.</p>
+          <div class="team-socials">
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+            <a href="#"><i class="fab fa-facebook"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar" style="background:linear-gradient(135deg,#1a2d0f,#1a4028);">
+          <span>🧑‍🔧</span>
+        </div>
+        <div class="team-info">
+          <h4>Lê Đức Anh</h4>
+          <p class="team-role">CTO</p>
+          <p class="team-bio">Kiến trúc sư hệ thống với background Java/Spring Boot. Xây dựng toàn bộ hạ tầng backend đảm bảo tốc độ và bảo mật.</p>
+          <div class="team-socials">
+            <a href="#"><i class="fab fa-github"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TIMELINE -->
+<section class="timeline-section">
+  <div class="section-inner">
+    <div class="section-center-header">
+      <div class="section-label"><i class="fas fa-history"></i> Hành trình phát triển</div>
+      <h2>Từ ý tưởng đến<br>nền tảng 50K giao dịch</h2>
+    </div>
+    <div class="timeline">
+      <div class="tl-item left">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <span class="tl-year">2021</span>
+          <h4>Thành lập TechParts</h4>
+          <p>Ra mắt phiên bản beta với 100 tin đăng đầu tiên. Hoạt động chủ yếu qua Facebook Group trước khi có website.</p>
+        </div>
+      </div>
+      <div class="tl-item right">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <span class="tl-year">2022</span>
+          <h4>Ra mắt website chính thức</h4>
+          <p>Website v1.0 với hệ thống đăng bán, kiểm duyệt tự động và thanh toán escrow. Đạt 1,000 giao dịch/tháng.</p>
+        </div>
+      </div>
+      <div class="tl-item left">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <span class="tl-year">2023</span>
+          <h4>Mở rộng toàn quốc & Series A</h4>
+          <p>Giao hàng toàn quốc, hợp tác với 5 đơn vị vận chuyển. Gọi vốn Series A thành công, đạt 10,000 người dùng.</p>
+        </div>
+      </div>
+      <div class="tl-item right">
+        <div class="tl-dot active"></div>
+        <div class="tl-card active">
+          <span class="tl-year tl-year-now">2025 · Hiện tại</span>
+          <h4>50,000+ giao dịch, tiếp tục phát triển</h4>
+          <p>Nền tảng lớn nhất Việt Nam về linh kiện cũ. Sắp ra mắt ứng dụng mobile và tính năng AI định giá tự động.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact-section" id="contact">
+  <div class="section-inner">
+    <div class="contact-grid">
+      <div class="contact-info">
+        <div class="section-label"><i class="fas fa-envelope"></i> Liên hệ</div>
+        <h2>Bạn có câu hỏi?<br>Chúng tôi luôn sẵn sàng</h2>
+        <p>Đội ngũ hỗ trợ của TechParts hoạt động 7 ngày/tuần, sẵn sàng giải đáp mọi thắc mắc về mua bán và sử dụng nền tảng.</p>
+        <div class="contact-items">
+          <div class="ci-item"><div class="ci-icon"><i class="fas fa-envelope"></i></div><div><h5>Email</h5><p>support@techparts.vn</p></div></div>
+          <div class="ci-item"><div class="ci-icon orange"><i class="fas fa-phone"></i></div><div><h5>Hotline</h5><p>1800 6868 (Miễn phí)</p></div></div>
+          <div class="ci-item"><div class="ci-icon green"><i class="fab fa-facebook-messenger"></i></div><div><h5>Facebook</h5><p>m.me/TechPartsVN</p></div></div>
+          <div class="ci-item"><div class="ci-icon purple"><i class="fas fa-map-marker-alt"></i></div><div><h5>Địa chỉ</h5><p>72 Lê Thánh Tôn, Quận 1, TP.HCM</p></div></div>
+        </div>
+      </div>
+      <div class="contact-form-wrap">
+        <h3>Gửi tin nhắn</h3>
+        <div class="cf-group">
+          <label>Họ và tên</label>
+          <input type="text" id="cf-name" placeholder="Nguyễn Văn A">
+        </div>
+        <div class="cf-group">
+          <label>Email</label>
+          <input type="email" id="cf-email" placeholder="email@example.com">
+        </div>
+        <div class="cf-group">
+          <label>Chủ đề</label>
+          <select id="cf-subject">
+            <option value="">-- Chọn chủ đề --</option>
+            <option>Hỗ trợ giao dịch</option>
+            <option>Báo cáo tin đăng vi phạm</option>
+            <option>Hợp tác kinh doanh</option>
+            <option>Góp ý tính năng</option>
+            <option>Khác</option>
+          </select>
+        </div>
+        <div class="cf-group">
+          <label>Nội dung</label>
+          <textarea id="cf-msg" rows="4" placeholder="Mô tả vấn đề hoặc câu hỏi của bạn..."></textarea>
+        </div>
+        <button class="cf-submit" onclick="submitContact()">
+          <span id="cf-btn-text"><i class="fas fa-paper-plane"></i> Gửi tin nhắn</span>
+          <span id="cf-btn-loader" style="display:none;"><i class="fas fa-spinner fa-spin"></i> Đang gửi...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="about-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="logo" style="font-size:1.4rem;margin-bottom:0.8rem;">Tech<span>Parts</span></div>
+      <p>Nền tảng mua bán linh kiện máy tính cũ uy tín nhất Việt Nam. Minh bạch – An toàn – Tin cậy.</p>
+      <div class="footer-socials">
+        <a href="#"><i class="fab fa-facebook-f"></i></a>
+        <a href="#"><i class="fab fa-youtube"></i></a>
+        <a href="#"><i class="fab fa-tiktok"></i></a>
+        <a href="#"><i class="fab fa-discord"></i></a>
+      </div>
+    </div>
+    <div class="footer-links">
+      <h5>Dịch vụ</h5>
+      <a href="shop.html">Mua hàng</a>
+      <a href="sell.html">Bán hàng</a>
+      <a href="#">Định giá AI</a>
+    </div>
+    <div class="footer-links">
+      <h5>Hỗ trợ</h5>
+      <a href="#">Chính sách bảo vệ</a>
+      <a href="#">Hướng dẫn đăng bán</a>
+      <a href="#">Câu hỏi thường gặp</a>
+      <a href="#contact">Liên hệ</a>
+    </div>
+    <div class="footer-links">
+      <h5>Pháp lý</h5>
+      <a href="#">Điều khoản sử dụng</a>
+      <a href="#">Chính sách bảo mật</a>
+      <a href="#">Quy định đăng bán</a>
+      <a href="#">Chính sách đổi trả</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 TechParts. Tất cả quyền được bảo lưu.</p>
+    <p>Được xây dựng với ❤️ cho cộng đồng tech Việt Nam</p>
+  </div>
+</footer>
+
+<script src="about.js"></script>
+</body>
+</html>
